@@ -1,0 +1,73 @@
+.column{
+    overflow: scroll;
+    height: 500px;
+}
+
+.friends-column{
+    border-right: solid 1px #AAA;
+    box-shadow: 2px 0 1px -1px rgba(0, 0, 0, .2);
+}
+
+.friend-element{
+    margin-top: 0;
+    padding: 5px;
+    height: 80px;
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2);
+}
+
+.friend-element:hover{
+    background: #F9F9F9;
+}
+
+.friend-photo{
+    height: 70px;
+    margin-top: 2px;
+    display: inline-block;
+}
+
+.friend-name{
+    margin-left: 5px;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.message{
+    position: relative;
+    margin-bottom: 15px;
+    padding: 8px;
+    width: 70%;
+    clear: both;
+}
+
+.my-message{
+    float: right;
+    margin-right: 20px;
+    background: #F9F9F9;
+}
+
+.friend-message{
+    color: #FFFFFF;
+    margin-left: 20px;
+    background: #0072C6;
+}
+
+.triangle{
+    position: absolute;
+    height: 0;
+    width: 0;
+    border: 10px solid transparent;
+    top: 10px;
+}
+
+
+.left-triangle{
+    left: -20px;
+    border-top-color: #0072C6;
+    border-right-color: #0072C6;
+}
+
+.right-triangle{
+    right: -20px;
+    border-top-color: #F9F9F9;
+    border-left-color: #F9F9F9;
+}
