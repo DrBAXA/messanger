@@ -28,4 +28,8 @@ public class MessageService {
         return messageDAO.getByUser(from, to, first, count);
     }
 
+    public void addMessage(Message message){
+        messageDAO.save(message);
+    }
+
 }

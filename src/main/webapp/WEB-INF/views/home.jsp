@@ -4,6 +4,7 @@
     <head>
         <script src="<c:url value="/resources"/>/jQuery/jquery.min.js"></script>
         <script src="<c:url value="/resources"/>/jQuery/jquery.nicescroll.min.js"></script>
+        <script src="<c:url value="/resources"/>/jQuery/JQuery.debounce.js"></script>
         <link rel="stylesheet" href="<c:url value="/resources"/>/styles/style.css">
         <link rel="stylesheet" href="<c:url value="/resources"/>/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="<c:url value="/resources"/>/bootstrap/css/bootstrap-theme.min.css">
@@ -40,27 +41,16 @@
                     </c:forEach>
                 </ul>
             </div>
-            <div class="col-lg-8 col-md-8 column messages-column">
+            <div class="col-lg-8 col-md-8 column messages-column" id="messages-column">
                 <div class="messages" id="messages">
-                    <div class="message friend-message">
-                        <div class="triangle left-triangle"></div>
-                        <div class="message-text">
-                            Привдівлао діваомп ізвшармп ідвамлоівда іщвшаг ідвало іжєвадлп ідвалом ідварм ідвам дівлао
-                        </div>
-                        <div class="message-date">
-                            21.05.2015 18:25
-                        </div>
-                    </div>
-                    <div class="message my-message">
-                        <div class="triangle right-triangle"></div>
-                        <div class="message-text">
-                            Привдівлао діваомп ізвшармп ідвамлоівда іщвшаг ідвало іжєвадлп ідвалом ідварм ідвам дівлао
-                        </div>
-                        <div class="message-date">
-                            21.05.2015 18:25
-                        </div>
-                    </div>
+
                 </div>
+            </div>
+            <div class="col-lg-8 col-md-8 new-message-box">
+                <div class="new-message">
+                    <textarea id="message"></textarea>
+                </div>
+                <div class="btn btn-primary btn-send" onclick="sendMessage()">Send</div>
             </div>
         </div>
     </body>

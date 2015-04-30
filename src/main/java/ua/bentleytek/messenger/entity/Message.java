@@ -1,10 +1,12 @@
 package ua.bentleytek.messenger.entity;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import ua.bentleytek.messenger.util.UserIdJsonDeserializer;
 import ua.bentleytek.messenger.util.UserIdJsonSerializer;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "messages")
@@ -15,7 +17,7 @@ public class Message {
     @Column
     private String text;
     @Column
-    private Date date;
+    private Timestamp date;
     @ManyToOne
     @JoinColumn(name = "user_from")
     @JsonSerialize(using = UserIdJsonSerializer.class)
@@ -23,6 +25,7 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "user_to")
     @JsonSerialize(using = UserIdJsonSerializer.class)
+    @JsonDeserialize(using = UserIdJsonDeserializer.class)
     private User to;
 
     public int getId() {
@@ -41,11 +44,11 @@ public class Message {
         this.text = text;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 

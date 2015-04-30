@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ua.bentleytek.messenger.dao.MessageDAO;
 import ua.bentleytek.messenger.dao.UsersDAO;
+import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
 
-import java.util.Set;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -16,6 +18,9 @@ public class UserService {
 
     @Autowired
     UsersDAO usersDAO;
+
+    @Autowired
+    MessageDAO messageDAO;
 
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -36,7 +41,12 @@ public class UserService {
         usersDAO.save(user);
     }
 
-    public Set<User> getFriends(String name){
+    public List<User> getFriends(String name){
         return getUser(name).getFriends();
+    }
+
+    public Iterable<Message> check(String name){
+        User user = getUser(name);
+        return messageDAO.getUnread(user, user.getLastCheck());
     }
 }

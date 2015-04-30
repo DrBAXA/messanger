@@ -9,7 +9,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name="users")
@@ -46,14 +47,25 @@ public class User implements Serializable{
     @Column(name="enabled")
     private int enabled;
 
+    @Column
+    private Timestamp lastCheck;
+
+    @Transient
+    private boolean online;
+
     @ManyToMany
     @JoinTable( name = "friends",
                 joinColumns =  {@JoinColumn(name = "user_id", referencedColumnName = "id")},
                 inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")})
-    private Set<User> friends;
+    private List<User> friends;
 
-    @Transient
-    private boolean online;
+    public Timestamp getLastCheck() {
+        return lastCheck;
+    }
+
+    public void setLastCheck(Timestamp lastCheck) {
+        this.lastCheck = lastCheck;
+    }
 
     public boolean isOnline() {
         return online;
@@ -94,11 +106,11 @@ public class User implements Serializable{
         this.enabled = enabled;
     }
 
-    public Set<User> getFriends() {
+    public List<User> getFriends() {
         return friends;
     }
 
-    public void setFriends(Set<User> friends) {
+    public void setFriends(List<User> friends) {
         this.friends = friends;
     }
 

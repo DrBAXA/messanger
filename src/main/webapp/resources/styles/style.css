@@ -1,18 +1,20 @@
 .column{
     overflow: scroll;
-    height: 500px;
 }
 
 .friends-column{
-    border-right: solid 1px #AAA;
-    box-shadow: 2px 0 1px -1px rgba(0, 0, 0, .2);
+    height: 600px;
 }
 
 .friend-element{
     margin-top: 0;
     padding: 5px;
     height: 80px;
-    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2);
+    border-bottom: solid 1px #F9F9F9;
+}
+
+.selected{
+    background-color: #F9F9F9;
 }
 
 .friend-element:hover{
@@ -29,6 +31,12 @@
     margin-left: 5px;
     margin-top: 10px;
     display: inline-block;
+}
+
+.messages-column{
+    height: 500px;
+    border-right: solid 1px #F9F9F9;
+    border-left: solid 1px #F9F9F9;
 }
 
 .message{
@@ -70,4 +78,30 @@
     right: -20px;
     border-top-color: #F9F9F9;
     border-left-color: #F9F9F9;
+}
+
+.new-message-box{
+    padding: 5px;
+    display: table;
+    height: 100px;
+    background-color: #F5F5F5;
+}
+
+.new-message{
+    display: table-cell;
+    margin-top: 5px;
+    margin-right: 15px;
+    padding: 5px;
+    background-color: #FFFFFF;
+    height: 90%;
+    width: 100%;
+    border-radius: 1px;
+}
+
+textarea{
+    height: 100%;
+    width: 100%;
+    border: none;
+    resize: none;
+    margin: 5px;
 }
