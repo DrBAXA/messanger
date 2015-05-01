@@ -15,8 +15,7 @@ public interface MessageDAO extends CrudRepository<Message, Integer> {
             " ORDER BY date DESC LIMIT ?3, ?4", nativeQuery = true)
     Iterable<Message> getByUser(User user, User friend, int first, int count);
 
-    @Query(value = "SELECT * FROM messages WHERE user_from = ?1 AND date > ?2" +
-            " ORDER BY date DESC", nativeQuery = true)
-    Iterable<Message> getUnread(User user, Timestamp timestamp);
+    @Query(value = "SELECT * FROM messages WHERE  user_to = ?1 AND is_read = 0", nativeQuery = true)
+    Iterable<Message> getUnread(User user);
 
 }

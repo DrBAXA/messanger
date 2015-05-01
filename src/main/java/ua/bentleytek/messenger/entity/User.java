@@ -47,8 +47,8 @@ public class User implements Serializable{
     @Column(name="enabled")
     private int enabled;
 
-    @Column
-    private Timestamp lastCheck;
+    @Column(name = "last_visit")
+    private Timestamp lastVisit;
 
     @Transient
     private boolean online;
@@ -59,15 +59,16 @@ public class User implements Serializable{
                 inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")})
     private List<User> friends;
 
-    public Timestamp getLastCheck() {
-        return lastCheck;
+    public Timestamp getLastVisit() {
+        return lastVisit;
     }
 
-    public void setLastCheck(Timestamp lastCheck) {
-        this.lastCheck = lastCheck;
+    public void setLastVisit(Timestamp lastVisit) {
+        this.lastVisit = lastVisit;
     }
 
     public boolean isOnline() {
+        online = (System.currentTimeMillis() - lastVisit.getTime()) < 60000;
         return online;
     }
 
@@ -140,5 +141,22 @@ public class User implements Serializable{
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+
+        if (!name.equals(user.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

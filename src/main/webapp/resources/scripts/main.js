@@ -2,24 +2,99 @@ var selectedFriend;
 var messagesCount = 0;
 var messagesHeight = 0;
 var currentMessagesPackHeight = 0;
+var friends = [];
 
 $(document).ready(
     function() {
-        $(".column").niceScroll({cursorcolor:'#00F'}).hide();
-
-        $('.friend-element').on('click', function(event){
-            $('.selected').removeClass('selected');
-            $(event.currentTarget).addClass("selected");
-            selectFriend($(event.currentTarget).attr('id'));
-        });
-
-        $('#messages-column').scroll($.debounce( 500, function(){
-            if($(this).scrollTop() == 0){
-                getMessages(selectedFriend, messagesCount);
-            }
-        }));
-
+        registerEvents();
+        checkNewMessagesCycle();
     });
+
+function registerEvents(){
+    $(".column").niceScroll({cursorcolor:'#00F'}).hide();
+
+    $('.friend-element').on('click', function(event){
+        $('.selected').removeClass('selected');
+        $(event.currentTarget).addClass("selected");
+        selectFriend($(event.currentTarget).attr('id'));
+    });
+
+    $('#messages-column').scroll($.debounce( 500, function(){
+        if($(this).scrollTop() == 0){
+            getMessages(selectedFriend, messagesCount);
+        }
+    }));
+}
+
+function loadFriends(){
+    $.ajax({
+        url: getHomeUrl()+'friends=',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: addMessagesToTop
+        }
+    })
+}
+
+function showFriends(friends){
+    friends.forEach(addFriendElement)
+}
+
+function addFriendElement(friend){
+    var friendElement = getFriendElement(friend);
+    $('#friends').append(friendElement);
+    friends.push(friend.id)
+}
+
+function getFriendElement(friend){
+    var friendElementHtml ='<li class=" friend-element" id="' + friend.id + '">' +
+                                '<div class="media-left">' +
+                                    '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources"/>/img/' + friend.photo + '">' +
+                                '</div>' +
+                                '<div class="media-body">' +
+                                    '<h4 class="media-heading">' + friend.name + '</h4>' +
+                                     friend.online ? 'online' : '' +
+                                '</div></li>';
+    return $.parseHTML(friendElementHtml);
+}
+
+function checkNewMessagesCycle(){
+        setInterval(checkNewMessages, 10000);
+}
+
+function checkNewMessages(){
+    $.ajax({
+        url: getHomeUrl()+'messages/unread',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: processChecked
+        }
+    })
+}
+
+function processChecked(unreadMap){
+    clearUnreadMessage();
+    for(var friendId in unreadMap){
+        addUnreadMessages(friendId, unreadMap[friendId]);
+    }
+}
+
+function clearUnreadMessage(){
+    friends.forEach(function(id){
+        var friendElement = $('#' + id).find('.media-body h4');
+        var name = $(friendElement).text();
+        var pattern = /\(\d\)$/;
+        name = name.replace(pattern, '')
+    })
+}
+
+function addUnreadMessages(friendId, count){
+    var friendElement = $('#' + friendId).find('.media-body h4');
+    var name = $(friendElement).text();
+    $(friendElement).text(name+ ' (' + count + ')');
+}
 
 function increaseValues(elementHeight){
     messagesCount++;
@@ -48,12 +123,12 @@ function getMessages(friendId, first){
 }
 
 function getMessageElement(message){
-    var messageElementText ='<div class="message">' +
+    var messageElementHtml ='<div class="message">' +
         '<div class="triangle"></div>' +
         '<div class="message-text">' + message.text + '</div>'+
         '<div class="message-date">' + new Date(message.date).toLocaleString() + '</div>'+
         '</div>';
-    var messageElement = $.parseHTML(messageElementText);
+    var messageElement = $.parseHTML(messageElementHtml);
 
     if(message.to.id == selectedFriend){
         $(messageElement).addClass('my-message');
@@ -75,7 +150,7 @@ function addMessagesToTop(messages){
         increaseValues($(messageElement).height());
         $('#messages-column').scrollTop(currentMessagesPackHeight);
     });
-
+    checkNewMessages();
 }
 
 function addMessageToBottom(message){

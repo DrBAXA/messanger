@@ -6,9 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.MessageDAO;
 import ua.bentleytek.messenger.dao.UsersDAO;
-import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -45,8 +45,9 @@ public class UserService {
         return getUser(name).getFriends();
     }
 
-    public Iterable<Message> check(String name){
+    public void setLastVisit(String name){
         User user = getUser(name);
-        return messageDAO.getUnread(user, user.getLastCheck());
+        user.setLastVisit(new Timestamp(System.currentTimeMillis()));
+        usersDAO.save(user);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import ua.bentleytek.messenger.interceptor.UserInterceptor;
 
 import java.util.List;
 
@@ -47,5 +48,8 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 		configurer.enable();
 	}
 
-	
+    @Override
+    public void addInterceptors(InterceptorRegistry interceptorRegistry){
+        interceptorRegistry.addInterceptor(new UserInterceptor()).addPathPatterns("/**");
+    }
 }

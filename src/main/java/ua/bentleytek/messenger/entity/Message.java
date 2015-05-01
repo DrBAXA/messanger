@@ -27,6 +27,8 @@ public class Message {
     @JsonSerialize(using = UserIdJsonSerializer.class)
     @JsonDeserialize(using = UserIdJsonDeserializer.class)
     private User to;
+    @Column(name = "is_read")
+    private boolean read;
 
     public int getId() {
         return id;
@@ -66,5 +68,13 @@ public class Message {
 
     public void setTo(User to) {
         this.to = to;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

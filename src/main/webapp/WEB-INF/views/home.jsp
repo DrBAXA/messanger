@@ -24,8 +24,8 @@
             <nav class="navbar navbar-default">
                 <p class="navbar-right navbar-text">Signed in as <a href="#" class="navbar-link">Mark Otto</a></p>
             </nav>
-            <div class="col-lg-4 col-md-4 column friends-column" id="friends">
-                <ul class="media-list">
+            <div class="col-lg-4 col-md-4 column friends-column">
+                <ul class="media-list" id="friends">
                     <c:forEach var="friend" items="${friends}">
                         <li class=" friend-element" id="${friend.id}">
                             <div class="media-left">

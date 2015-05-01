@@ -15,6 +15,7 @@ import ua.bentleytek.messenger.service.UserService;
 
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/messages")
@@ -26,15 +27,15 @@ public class MessageController {
     UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<Iterable<Message>> getMessages(Principal user,
+    public ResponseEntity<Iterable<Message>> getMessages(Principal principal,
                                                      @RequestParam("first") int first,
                                                      @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                                      @RequestParam(value = "friendId", required = true) int friendId)
     {
-        if(user != null) {
-            User from = userService.getUser(user.getName());
-            User to = userService.getUser(friendId);
-            Iterable<Message> messages = messageService.getMessages(from, to, first, count);
+        if(principal != null) {
+            User user = userService.getUser(principal.getName());
+            User friend = userService.getUser(friendId);
+            Iterable<Message> messages = messageService.getMessages(user, friend, first, count);
             return new ResponseEntity<>(messages, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -49,8 +50,9 @@ public class MessageController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping("/check")
-    public ResponseEntity<Iterable<Message>> checkNewMessages(Principal principal){
-        return new ResponseEntity<>(userService.check(principal.getName()), HttpStatus.OK);
+    @RequestMapping("/unread")
+    public ResponseEntity<Map<Integer, Integer>> checkNewMessages(Principal principal){
+        User user = userService.getUser(principal.getName());
+        return new ResponseEntity<>(messageService.getUnread(user), HttpStatus.OK);
     }
 }
