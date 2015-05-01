@@ -1,5 +1,6 @@
 package ua.bentleytek.messenger.entity;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 import ua.bentleytek.messenger.validator.Unique;
 import ua.bentleytek.messenger.validator.UniqueField;
@@ -33,6 +34,7 @@ public class User implements Serializable{
     @Unique(field = UniqueField.EMAIL, message = "Користувач з такою адресою електронної пошти вже зареєстрований")
     private String email;
 
+    @JsonIgnore
     @Column
     @NotNull
     @Size(min = 6, message = "Пароль повинен містити не менше 6 символів!")
@@ -41,9 +43,11 @@ public class User implements Serializable{
     @Column
     private String photo;
 
+    @JsonIgnore
     @Column(name = "role")
     private String role;
 
+    @JsonIgnore
     @Column(name="enabled")
     private int enabled;
 
@@ -53,6 +57,7 @@ public class User implements Serializable{
     @Transient
     private boolean online;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "friends",
                 joinColumns =  {@JoinColumn(name = "user_id", referencedColumnName = "id")},

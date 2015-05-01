@@ -30,12 +30,14 @@ public class MessageController {
     public ResponseEntity<Iterable<Message>> getMessages(Principal principal,
                                                      @RequestParam("first") int first,
                                                      @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-                                                     @RequestParam(value = "friendId", required = true) int friendId)
+                                                     @RequestParam(value = "friendId") int friendId,
+                                                     @RequestParam(value = "setRead", required = false, defaultValue = "true") boolean setRead)
+
     {
         if(principal != null) {
             User user = userService.getUser(principal.getName());
             User friend = userService.getUser(friendId);
-            Iterable<Message> messages = messageService.getMessages(user, friend, first, count);
+            Iterable<Message> messages = messageService.getMessages(user, friend, first, count, setRead);
             return new ResponseEntity<>(messages, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

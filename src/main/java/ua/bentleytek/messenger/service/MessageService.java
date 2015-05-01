@@ -33,18 +33,18 @@ public class MessageService {
         return result;
     }
 
-    public Iterable<Message> getMessages(User user, User friend){
-        return getMessages(user, friend, 0);
+    public Iterable<Message> getMessages(User user, User friend, boolean setRead){
+        return getMessages(user, friend, 0, setRead);
     }
 
-    public Iterable<Message> getMessages(User user, User friend, int first){
-        return getMessages(user, friend, first, DEFAULT_PAGE_COUNT);
+    public Iterable<Message> getMessages(User user, User friend, int first, boolean setRead){
+        return getMessages(user, friend, first, DEFAULT_PAGE_COUNT, setRead);
     }
 
-    public Iterable<Message> getMessages(User user, User friend, int first, int count){
+    public Iterable<Message> getMessages(User user, User friend, int first, int count, boolean setRead){
         Iterable<Message> messages = messageDAO.getByUser(user, friend, first, count);
         for(Message message : messages){
-            if((! message.isRead()) && message.getTo().equals(user) )
+            if(setRead && (! message.isRead()) && message.getTo().equals(user) )
                 read(message);
         }
         return messages;

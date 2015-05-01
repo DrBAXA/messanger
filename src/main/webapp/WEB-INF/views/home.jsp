@@ -26,19 +26,7 @@
             </nav>
             <div class="col-lg-4 col-md-4 column friends-column">
                 <ul class="media-list" id="friends">
-                    <c:forEach var="friend" items="${friends}">
-                        <li class=" friend-element" id="${friend.id}">
-                            <div class="media-left">
-                                <img class="friend-photo media-object" src="<c:url value="/resources"/>/img/${friend.photo}">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">${friend.name}</h4>
-                                <c:if test="${friend.online == true}">
-                                    online
-                                </c:if>
-                            </div>
-                        </li>
-                    </c:forEach>
+
                 </ul>
             </div>
             <div class="col-lg-8 col-md-8 column messages-column" id="messages-column">

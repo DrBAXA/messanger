@@ -3,17 +3,18 @@ var messagesCount = 0;
 var messagesHeight = 0;
 var currentMessagesPackHeight = 0;
 var friends = [];
+var newMessages = {};
 
 $(document).ready(
     function() {
         registerEvents();
-        checkNewMessagesCycle();
+        loadFriends();
     });
 
 function registerEvents(){
     $(".column").niceScroll({cursorcolor:'#00F'}).hide();
 
-    $('.friend-element').on('click', function(event){
+    $('#friends').on('click', '.friend-element', function(event){
         $('.selected').removeClass('selected');
         $(event.currentTarget).addClass("selected");
         selectFriend($(event.currentTarget).attr('id'));
@@ -24,21 +25,23 @@ function registerEvents(){
             getMessages(selectedFriend, messagesCount);
         }
     }));
+    checkNewMessagesCycle();
 }
 
 function loadFriends(){
     $.ajax({
-        url: getHomeUrl()+'friends=',
+        url: getHomeUrl()+'friends',
         type: 'GET',
         contentType: 'application/json; charset=utf-8',
         statusCode: {
-            200: addMessagesToTop
+            200: showFriends
         }
     })
 }
 
 function showFriends(friends){
-    friends.forEach(addFriendElement)
+    friends.forEach(addFriendElement);
+    checkNewMessages()
 }
 
 function addFriendElement(friend){
@@ -48,13 +51,14 @@ function addFriendElement(friend){
 }
 
 function getFriendElement(friend){
-    var friendElementHtml ='<li class=" friend-element" id="' + friend.id + '">' +
+    var online = friend.online ? 'online' : '';
+    var friendElementHtml ='<li class="friend-element" id="' + friend.id + '">' +
                                 '<div class="media-left">' +
-                                    '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources"/>/img/' + friend.photo + '">' +
+                                    '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources/img/' + friend.photo + '">' +
                                 '</div>' +
                                 '<div class="media-body">' +
                                     '<h4 class="media-heading">' + friend.name + '</h4>' +
-                                     friend.online ? 'online' : '' +
+                                     online +
                                 '</div></li>';
     return $.parseHTML(friendElementHtml);
 }
@@ -78,6 +82,26 @@ function processChecked(unreadMap){
     clearUnreadMessage();
     for(var friendId in unreadMap){
         addUnreadMessages(friendId, unreadMap[friendId]);
+        if(friendId == selectedFriend){
+            countUnread(friendId, unreadMap[friendId])
+        }
+    }
+}
+
+function countUnread(friendId, countAll){
+    if(friendId in newMessages){
+        newMessages[friendId].all = countAll;
+        var toLoad = countAll - newMessages[friendId].loaded;
+        if(toLoad > 0){
+            loadNewMessages(friendId, toLoad)
+        }
+    }else{
+        var newMessagesByFriend = {
+            all: countAll,
+            loaded: 0
+        };
+        newMessages[friendId] = newMessagesByFriend;
+        loadNewMessages(friendId, countAll)
     }
 }
 
@@ -86,7 +110,8 @@ function clearUnreadMessage(){
         var friendElement = $('#' + id).find('.media-body h4');
         var name = $(friendElement).text();
         var pattern = /\(\d\)$/;
-        name = name.replace(pattern, '')
+        name = name.replace(pattern, '');
+        $(friendElement).text(name)
     })
 }
 
@@ -109,6 +134,20 @@ function selectFriend(id){
         $('#messages').empty();
         getMessages(selectedFriend, messagesCount);
     }
+}
+
+function loadNewMessages(friendId, count){
+    $.ajax({
+        url: getHomeUrl()+'messages?friendId=' + friendId + '&first=' + 0 + '&count=' + count + '&setRead=false',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: function(messages){
+                newMessages[friendId].loaded += messages.length;
+                messages.reverse().forEach(addMessageToBottom)
+            }
+        }
+    })
 }
 
 function getMessages(friendId, first){
