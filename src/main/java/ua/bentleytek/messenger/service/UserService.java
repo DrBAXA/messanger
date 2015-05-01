@@ -9,7 +9,9 @@ import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -43,6 +45,17 @@ public class UserService {
 
     public List<User> getFriends(String name){
         return getUser(name).getFriends();
+    }
+
+    public Map<Integer, Boolean> getOnline(String name){
+        Map<Integer, Boolean> result = new HashMap<>();
+        User user = getUser(name);
+        for(User friend : user.getFriends()){
+            if (friend.isOnline()){
+                result.put(friend.getId(), true);
+            }
+        }
+        return result;
     }
 
     public void setLastVisit(String name){

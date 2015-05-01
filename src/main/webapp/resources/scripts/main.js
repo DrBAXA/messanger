@@ -15,8 +15,6 @@ function registerEvents(){
     $(".column").niceScroll({cursorcolor:'#00F'}).hide();
 
     $('#friends').on('click', '.friend-element', function(event){
-        $('.selected').removeClass('selected');
-        $(event.currentTarget).addClass("selected");
         selectFriend($(event.currentTarget).attr('id'));
     });
 
@@ -25,7 +23,7 @@ function registerEvents(){
             getMessages(selectedFriend, messagesCount);
         }
     }));
-    checkNewMessagesCycle();
+    checkChangesCycle();
 }
 
 function loadFriends(){
@@ -41,6 +39,7 @@ function loadFriends(){
 
 function showFriends(friends){
     friends.forEach(addFriendElement);
+    selectFriend(friends[0].id);
     checkNewMessages()
 }
 
@@ -58,13 +57,40 @@ function getFriendElement(friend){
                                 '</div>' +
                                 '<div class="media-body">' +
                                     '<h4 class="media-heading">' + friend.name + '</h4>' +
-                                     online +
+                                     '<span>' + online + '</span>' +
                                 '</div></li>';
     return $.parseHTML(friendElementHtml);
 }
 
-function checkNewMessagesCycle(){
-        setInterval(checkNewMessages, 10000);
+function checkFriendsStatus(){
+    $.ajax({
+        url: getHomeUrl()+'friends/online',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: function(friendsOnline){
+                clearFriendsStatus();
+                updateFriendsStatus(friendsOnline);
+            }
+        }
+    })
+}
+
+function updateFriendsStatus(friends){
+    for(var friendId in friends){
+        $('#' + friendId).find('div.media-body span').text('online')
+    }
+}
+
+function clearFriendsStatus(){
+    friends.forEach(function(friendId){
+        $('#' + friendId).find('div.media-body span').text('')
+    })
+}
+
+function checkChangesCycle(){
+    setInterval(checkNewMessages, 10000);
+    setInterval(checkFriendsStatus, 10000);
 }
 
 function checkNewMessages(){
@@ -127,6 +153,8 @@ function increaseValues(elementHeight){
 }
 
 function selectFriend(id){
+    $('.selected').removeClass('selected');
+    $('#' + id).addClass("selected");
     if(id != selectedFriend){
         messagesCount = 0;
         messagesHeight = 0;

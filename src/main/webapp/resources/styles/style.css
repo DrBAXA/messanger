@@ -13,12 +13,9 @@
     border-bottom: solid 1px #F9F9F9;
 }
 
-.selected{
-    background-color: #F9F9F9;
-}
-
-.friend-element:hover{
-    background: #F9F9F9;
+.selected, .friend-element:hover {
+    color: #FFFFFF;
+    background: #0072C6;
 }
 
 .friend-photo{

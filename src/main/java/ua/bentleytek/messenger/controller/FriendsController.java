@@ -10,6 +10,7 @@ import ua.bentleytek.messenger.entity.User;
 import ua.bentleytek.messenger.service.UserService;
 
 import java.security.Principal;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/friends")
@@ -21,5 +22,10 @@ public class FriendsController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Iterable<User>> getFriends(Principal user){
         return new ResponseEntity<Iterable<User>>(userService.getFriends(user.getName()), HttpStatus.OK);
+    }
+
+    @RequestMapping("/online")
+    public ResponseEntity<Map<Integer, Boolean>> checkOnline(Principal principal){
+        return new ResponseEntity<>(userService.getOnline(principal.getName()), HttpStatus.OK);
     }
 }
