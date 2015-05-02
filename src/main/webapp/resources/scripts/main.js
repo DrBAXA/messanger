@@ -69,7 +69,7 @@ Show loaded friends list
  */
 function showFriends(friends) {
     friends.forEach(addFriendElement);
-    selectFriend(friends[0].id);
+    //selectFriend(friends[0].id);
     checkNewMessages()
 }
 /*
