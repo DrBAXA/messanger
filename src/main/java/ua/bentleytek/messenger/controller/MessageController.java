@@ -54,7 +54,12 @@ public class MessageController {
 
     @RequestMapping("/unread")
     public ResponseEntity<Map<Integer, Integer>> checkNewMessages(Principal principal){
-        User user = userService.getUser(principal.getName());
-        return new ResponseEntity<>(messageService.getUnread(user), HttpStatus.OK);
+        if(principal != null) {
+            User user = userService.getUser(principal.getName());
+            return new ResponseEntity<>(messageService.getUnread(user), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
     }
 }

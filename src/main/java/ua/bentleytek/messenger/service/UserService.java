@@ -25,12 +25,18 @@ public class UserService {
 
     public User getUser(int id){
         User user = onlineUsersCash.get(id);
-        return user != null ? user : usersDAO.findOne(id);
+        if(user == null){
+            user = usersDAO.findOne(id);
+        }
+        return user;
     }
 
     public User getUser(String name){
         User user = onlineUsersCash.get(name);
-        return user != null? user : usersDAO.getByName(name);
+        if(user == null){
+            user = usersDAO.getByName(name);
+        }
+        return user;
     }
 
     public void addUser(User user){

@@ -31,7 +31,12 @@ public class OnlineUsersCash {
     }
 
     public User get(String name){
-        return onLineById.get(onLineByName.get(name));
+        Integer id = onLineByName.get(name);
+        if(id != null) {
+            return onLineById.get(id);
+        }else {
+            return null;
+        }
     }
 
     public boolean contains(int id){
@@ -66,7 +71,7 @@ public class OnlineUsersCash {
     @PostConstruct
     private void runCleaner(){
         cleaner = new Cleaner();
-        cleaner.run();
+        cleaner.start();
     }
 
     private class Cleaner extends Thread{

@@ -11,7 +11,7 @@
 </appender>
 
     <!-- Services logs -->
-    <logger name="sombra.service">
+    <logger name="ua.bentleytek.messenger">
         <level value="dabug"/>
         <appender-ref ref="console"/>
     </logger>
