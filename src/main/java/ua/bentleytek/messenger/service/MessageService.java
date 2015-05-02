@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @Service
 public class MessageService {
-    public static final int DEFAULT_PAGE_COUNT = 10;
+    private static final int DEFAULT_PAGE_COUNT = 10;
 
     @Autowired
     private MessageDAO messageDAO;
@@ -50,7 +50,7 @@ public class MessageService {
         messageDAO.save(message);
     }
 
-    public void read(Message message){
+    private void read(Message message){
         message.setRead(true);
         messageDAO.save(message);
     }

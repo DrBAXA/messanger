@@ -126,11 +126,10 @@ function countUnread(friendId, countAll) {
             loadNewMessages(friendId, toLoad)
         }
     } else {
-        var newMessagesByFriend = {
-            all: countAll,
-            loaded: 0
-        };
-        newMessages[friendId] = newMessagesByFriend;
+
+        newMessages[friendId] = {  all: countAll,
+                                   loaded: 0
+                                };
         loadNewMessages(friendId, countAll)
     }
 }
@@ -232,10 +231,10 @@ function addMessageToBottom(message) {
 }
 
 function sendMessage(event) {
-    event.preventDefault();
+    var messageInput = $("#message");
     if (event.keyCode == 13 ) {
         var pattern = /^\s*$/;
-        var text = $("#message").val();
+        var text = messageInput.val();
         if(! pattern.test(text)){
             var message = {
                 text: text,
@@ -253,6 +252,6 @@ function sendMessage(event) {
                 }
             });
         }
-        $("#message").val('')
+        messageInput.val('')
     }
 }

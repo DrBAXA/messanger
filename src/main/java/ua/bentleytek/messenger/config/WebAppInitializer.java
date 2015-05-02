@@ -19,7 +19,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
         fr.setInitParameter("forceEncoding", "true");
         fr.addMappingForUrlPatterns(null, true, "/*");
 
-        FilterRegistration.Dynamic entityManagerInView = servletContext.addFilter("entytyManagerInViewFilter",
+        FilterRegistration.Dynamic entityManagerInView = servletContext.addFilter("entityManagerInViewFilter",
                                                                                   new OpenEntityManagerInViewFilter());
         entityManagerInView.setInitParameter("entityManagerFactoryBeanName", "entityManagerFactory");
         entityManagerInView.setInitParameter("flushMode", "AUTO");

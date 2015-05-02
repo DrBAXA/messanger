@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class UserInterceptor extends HandlerInterceptorAdapter {
 
-    Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Autowired
     private UserService userService;

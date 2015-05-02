@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.bentleytek.messenger.dao.MessageDAO;
 import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
 
@@ -16,16 +15,12 @@ import java.util.Map;
 @Service
 public class UserService {
 
-    public static final String DEFAULT_USER_ROLE = "ROLE_USER";
+    private static final String DEFAULT_USER_ROLE = "ROLE_USER";
 
     @Autowired
-    UsersDAO usersDAO;
+    private UsersDAO usersDAO;
 
-    @Autowired
-    MessageDAO messageDAO;
-
-
-    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User getUser(int id){
         return usersDAO.findOne(id);

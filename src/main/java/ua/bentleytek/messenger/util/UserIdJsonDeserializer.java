@@ -2,7 +2,6 @@ package ua.bentleytek.messenger.util;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
@@ -26,8 +25,7 @@ public class UserIdJsonDeserializer extends JsonDeserializer<User>{
 
     @Override
     public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-            throws IOException, JsonProcessingException
-    {
+            throws IOException {
         ObjectCodec userCodec = jsonParser.getCodec();
         JsonNode userNode = userCodec.readTree(jsonParser);
 

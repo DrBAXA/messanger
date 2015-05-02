@@ -33,7 +33,7 @@ public class AppContext {
         properties.put("hibernate.show_sql",env.getProperty("hibernate.show_sql"));
         properties.put("hibernate.dialect",env.getProperty("hibernate.dialect"));
         return properties;
-    };
+    }
 
 
     @Bean

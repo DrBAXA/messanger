@@ -22,7 +22,7 @@
     <body>
         <div class="container col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-12 ">
             <nav class="navbar navbar-default">
-                <p class="navbar-right navbar-text">Signed in as <a href="#" class="navbar-link">Mark Otto</a></p>
+                <p class="navbar-right navbar-text">Signed in as <a href="/logout" class="navbar-link">${user}</a></p>
             </nav>
             <div class="col-lg-4 col-md-4 column friends-column">
                 <ul class="media-list" id="friends">

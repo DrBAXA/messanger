@@ -155,9 +155,8 @@ public class User implements Serializable{
 
         User user = (User) o;
 
-        if (!name.equals(user.name)) return false;
+        return name.equals(user.name);
 
-        return true;
     }
 
     @Override
