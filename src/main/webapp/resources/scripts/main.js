@@ -46,8 +46,8 @@ function registerEvents() {
 Init updating data each 10 seconds;
  */
 function checkChangesCycle() {
-    setInterval(checkNewMessages, 1000);
-    setInterval(checkFriendsStatus, 1000);
+    setInterval(checkNewMessages, 10000);
+    setInterval(checkFriendsStatus, 10000);
 }
 
 /*

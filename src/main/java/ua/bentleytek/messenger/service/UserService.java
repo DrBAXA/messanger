@@ -27,6 +27,7 @@ public class UserService {
         User user = onlineUsersCash.get(id);
         if(user == null){
             user = usersDAO.findOne(id);
+            initFriends(user);
         }
         return user;
     }
@@ -35,6 +36,7 @@ public class UserService {
         User user = onlineUsersCash.get(name);
         if(user == null){
             user = usersDAO.getByName(name);
+            initFriends(user);
         }
         return user;
     }
@@ -51,7 +53,7 @@ public class UserService {
         return getUser(name).getFriends();
     }
 
-    public Set<Integer> getOnline(String name){
+    public Set<Integer> getOnlineFriends(String name){
         Set<Integer> result = new HashSet<>();
         for(User user : getUser(name).getFriends()){
             int id = user.getId();
@@ -68,8 +70,19 @@ public class UserService {
             user.setLastVisit();
         }else{
             user = usersDAO.getByName(name);
+            initFriends(user);
             user.setLastVisit();
             onlineUsersCash.add(user);
         }
+    }
+
+    /**
+     * Load users friends from DB instead of use FetchType.EAGER
+     * because FetchType.EAGER loads friends recursively
+     * i.e. loads friends of friends
+     * @param user
+     */
+    private void initFriends(User user){
+        System.out.println(user.getFriends().size());
     }
 }

@@ -82,11 +82,10 @@
 }
 
 .new-message-box{
-    /*padding: 5px;*/
     height: 30px;
     border: solid 1px #F9F9F9;
     resize: none;
-    /*background-color: #F9F9F9;*/
+    background-color: #F9F9F9;
 }
 
 .message-text{
@@ -94,5 +93,6 @@
     width: 100%;
     border: none;
     resize: none;
+    background-color: inherit;
     /*margin: 5px;*/
 }

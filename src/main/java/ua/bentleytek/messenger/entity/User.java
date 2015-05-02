@@ -58,7 +58,7 @@ public class User implements Serializable{
     private boolean online;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable( name = "friends",
                 joinColumns =  {@JoinColumn(name = "user_id", referencedColumnName = "id")},
                 inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")})

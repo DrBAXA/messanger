@@ -34,7 +34,7 @@
 
                 </div>
             </div>
-            <div class="col-lg-8 col-md-8 new-message-box">
+            <div class="col-lg-8 col-lg-offset-4 col-md-8 col-md-offset-4 new-message-box">
                     <input class="message-text" id="message" placeholder="напишіть повідомлення ..." onkeyup="sendMessage(event)">
             </div>
         </div>

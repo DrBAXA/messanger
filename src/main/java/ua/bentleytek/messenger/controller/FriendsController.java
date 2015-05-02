@@ -26,6 +26,6 @@ public class FriendsController {
 
     @RequestMapping("/online")
     public ResponseEntity<Set<Integer>> checkOnline(Principal principal){
-        return new ResponseEntity<>(userService.getOnline(principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getOnlineFriends(principal.getName()), HttpStatus.OK);
     }
 }
