@@ -78,27 +78,17 @@
 }
 
 .new-message-box{
-    padding: 5px;
-    display: table;
-    height: 100px;
-    background-color: #F5F5F5;
+    /*padding: 5px;*/
+    height: 30px;
+    border: solid 1px #F9F9F9;
+    resize: none;
+    /*background-color: #F9F9F9;*/
 }
 
-.new-message{
-    display: table-cell;
-    margin-top: 5px;
-    margin-right: 15px;
-    padding: 5px;
-    background-color: #FFFFFF;
-    height: 90%;
-    width: 100%;
-    border-radius: 1px;
-}
-
-textarea{
+.message-text{
     height: 100%;
     width: 100%;
     border: none;
     resize: none;
-    margin: 5px;
+    /*margin: 5px;*/
 }

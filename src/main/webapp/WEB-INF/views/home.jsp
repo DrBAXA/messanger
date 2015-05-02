@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -35,10 +35,7 @@
                 </div>
             </div>
             <div class="col-lg-8 col-md-8 new-message-box">
-                <div class="new-message">
-                    <textarea id="message"></textarea>
-                </div>
-                <div class="btn btn-primary btn-send" onclick="sendMessage()">Send</div>
+                    <input class="message-text" id="message" placeholder="напишіть повідомлення ..." onkeyup="sendMessage(event)">
             </div>
         </div>
     </body>

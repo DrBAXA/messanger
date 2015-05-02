@@ -33,10 +33,6 @@ public class MessageService {
         return result;
     }
 
-    public Iterable<Message> getMessages(User user, User friend, boolean setRead){
-        return getMessages(user, friend, 0, setRead);
-    }
-
     public Iterable<Message> getMessages(User user, User friend, int first, boolean setRead){
         return getMessages(user, friend, first, DEFAULT_PAGE_COUNT, setRead);
     }
