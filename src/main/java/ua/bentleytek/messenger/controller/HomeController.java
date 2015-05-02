@@ -17,9 +17,6 @@ public class HomeController {
 
 	@RequestMapping(value="/")
 	public String homePage(ModelMap modelMap, Principal user) throws IOException{
-        if(user != null){
-            modelMap.addAttribute("friends", userService.getFriends(user.getName()));
-        }
 		return "home";
 	}
 }
