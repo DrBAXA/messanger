@@ -68,8 +68,8 @@ public class User implements Serializable{
         return lastVisit;
     }
 
-    public void setLastVisit(Timestamp lastVisit) {
-        this.lastVisit = lastVisit;
+    public void setLastVisit() {
+        this.lastVisit = new Timestamp(System.currentTimeMillis());
     }
 
     public boolean isOnline() {

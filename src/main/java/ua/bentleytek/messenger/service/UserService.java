@@ -7,10 +7,9 @@ import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
 
-import java.sql.Timestamp;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -19,15 +18,19 @@ public class UserService {
 
     @Autowired
     private UsersDAO usersDAO;
+    @Autowired
+    OnlineUsersCash onlineUsersCash;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User getUser(int id){
-        return usersDAO.findOne(id);
+        User user = onlineUsersCash.get(id);
+        return user != null ? user : usersDAO.findOne(id);
     }
 
     public User getUser(String name){
-        return usersDAO.getByName(name);
+        User user = onlineUsersCash.get(name);
+        return user != null? user : usersDAO.getByName(name);
     }
 
     public void addUser(User user){
@@ -42,20 +45,25 @@ public class UserService {
         return getUser(name).getFriends();
     }
 
-    public Map<Integer, Boolean> getOnline(String name){
-        Map<Integer, Boolean> result = new HashMap<>();
-        User user = getUser(name);
-        for(User friend : user.getFriends()){
-            if (friend.isOnline()){
-                result.put(friend.getId(), true);
+    public Set<Integer> getOnline(String name){
+        Set<Integer> result = new HashSet<>();
+        for(User user : getUser(name).getFriends()){
+            int id = user.getId();
+            if(onlineUsersCash.contains(id)){
+                result.add(id);
             }
         }
         return result;
     }
 
     public void setLastVisit(String name){
-        User user = getUser(name);
-        user.setLastVisit(new Timestamp(System.currentTimeMillis()));
-        usersDAO.save(user);
+        User user = onlineUsersCash.get(name);
+        if(user != null){
+            user.setLastVisit();
+        }else{
+            user = usersDAO.getByName(name);
+            user.setLastVisit();
+            onlineUsersCash.add(user);
+        }
     }
 }
