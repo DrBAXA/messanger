@@ -1,9 +1,9 @@
-var selectedFriend;
-var messagesCount = 0;
-var messagesHeight = 0;
-var currentMessagesPackHeight = 0;
-var friends = [];
-var newMessages = {};
+var selectedFriend;//Id of current selected friend
+var messagesCount = 0;//Count of loaded messages to list(used for loading older messages)
+var messagesHeight = 0;//Height of messages list(used for auto scroll to bottom after receiving or sending message
+var currentMessagesPackHeight = 0;//Height of just loaded messages (used fo keep scroll in position after adding messages to top
+var friends = [];//Friends id
+var newMessages = {};//Count all unread messages and already loaded unread messages for each friends
 
 $(document).ready(
     function () {
@@ -12,12 +12,28 @@ $(document).ready(
     });
 
 function registerEvents() {
+    /*
+    Make scroll more elegant
+     */
     $(".column").niceScroll({cursorcolor: '#F9F9F9'}).hide();
 
+    /*
+    Set new selected friend and load messages for him
+     */
     $('#friends').on('click', '.friend-element', function (event) {
-        selectFriend($(event.currentTarget).attr('id'));
+        var id = $(event.currentTarget).attr('id');
+        $('.selected').removeClass('selected');
+        $('#' + id).addClass("selected");
+        if (id != selectedFriend) {
+            messagesCount = 0;
+            messagesHeight = 0;
+            selectedFriend = id;
+            $('#messages').empty();
+            getMessages(selectedFriend);
+        }
     });
 
+    //Auto load older messages if scroll is in top of list
     $('#messages-column').scroll($.debounce(500, function () {
         if ($(this).scrollTop() == 0) {
             getMessages(selectedFriend, messagesCount);
@@ -26,7 +42,17 @@ function registerEvents() {
 
     checkChangesCycle();
 }
+/*
+Init updating data each 10 seconds;
+ */
+function checkChangesCycle() {
+    setInterval(checkNewMessages, 10000);
+    setInterval(checkFriendsStatus, 10000);
+}
 
+/*
+Request to get list of friends
+ */
 function loadFriends() {
     $.ajax({
         url: getHomeUrl() + 'friends',
@@ -38,18 +64,25 @@ function loadFriends() {
     })
 }
 
+/*
+Show loaded friends list
+ */
 function showFriends(friends) {
     friends.forEach(addFriendElement);
     selectFriend(friends[0].id);
     checkNewMessages()
 }
-
+/*
+Add each friend to document
+ */
 function addFriendElement(friend) {
     var friendElement = getFriendElement(friend);
     $('#friends').append(friendElement);
     friends.push(friend.id)
 }
-
+/*
+Create friends element from html
+ */
 function getFriendElement(friend) {
     var online = friend.online ? 'online' : '';
     var friendElementHtml = '<li class="friend-element" id="' + friend.id + '">' +
@@ -63,6 +96,9 @@ function getFriendElement(friend) {
     return $.parseHTML(friendElementHtml);
 }
 
+/*
+Request to get online status of friends
+ */
 function checkFriendsStatus() {
     $.ajax({
         url: getHomeUrl() + 'friends/online',
@@ -77,23 +113,27 @@ function checkFriendsStatus() {
     })
 }
 
+/*
+Set status of given friends to online
+ */
 function updateFriendsStatus(friends) {
     for (var friendId in friends) {
         $('#' + friendId).find('div.media-body span').text('online')
     }
 }
 
+/*
+Set status of all friends to offline
+ */
 function clearFriendsStatus() {
     friends.forEach(function (friendId) {
         $('#' + friendId).find('div.media-body span').text('')
     })
 }
 
-function checkChangesCycle() {
-    setInterval(checkNewMessages, 10000);
-    setInterval(checkFriendsStatus, 10000);
-}
-
+/*
+Request to get unread messages count by friends
+ */
 function checkNewMessages() {
     $.ajax({
         url: getHomeUrl() + 'messages/unread',
@@ -105,6 +145,9 @@ function checkNewMessages() {
     })
 }
 
+/*
+Show count of unread messages for each friend
+ */
 function processChecked(unreadMap) {
     clearUnreadMessage();
     for (var friendId in unreadMap) {
@@ -115,6 +158,10 @@ function processChecked(unreadMap) {
     }
 }
 
+/*
+Updating count of unread messages for each friend
+and loading new messages for current selected friend
+ */
 function countUnread(friendId, countAll) {
     if (friendId in newMessages) {
         newMessages[friendId].all = countAll;
@@ -126,14 +173,14 @@ function countUnread(friendId, countAll) {
             loadNewMessages(friendId, toLoad)
         }
     } else {
-
-        newMessages[friendId] = {  all: countAll,
-                                   loaded: 0
-                                };
+        newMessages[friendId] = {  all: countAll, loaded: 0};
         loadNewMessages(friendId, countAll)
     }
 }
 
+/*
+Clear count of unread messages for each friend
+ */
 function clearUnreadMessage() {
     friends.forEach(function (id) {
         var friendElement = $('#' + id).find('.media-body h4');
@@ -144,12 +191,18 @@ function clearUnreadMessage() {
     })
 }
 
+/*
+Set count of unread messages for given friend
+ */
 function addUnreadMessages(friendId, count) {
     var friendElement = $('#' + friendId).find('.media-body h4');
     var name = $(friendElement).text();
     $(friendElement).text(name + ' (' + count + ')');
 }
 
+/*
+
+ */
 function increaseValues(elementHeight) {
     messagesCount++;
     messagesHeight += elementHeight + 31;
@@ -167,6 +220,9 @@ function selectFriend(id) {
     }
 }
 
+/*
+Request to get unread messages
+ */
 function loadNewMessages(friendId, count) {
     $.ajax({
         url: getHomeUrl() + 'messages?friendId=' + friendId + '&first=' + 0 + '&count=' + count + '&setRead=false',
@@ -181,6 +237,9 @@ function loadNewMessages(friendId, count) {
     })
 }
 
+/*
+Request to get page of messages of FRIEND from FIRST number
+ */
 function getMessages(friendId, first) {
     $.ajax({
         url: getHomeUrl() + 'messages?friendId=' + friendId + '&first=' + first,
@@ -192,6 +251,9 @@ function getMessages(friendId, first) {
     })
 }
 
+/*
+Create message element from html
+ */
 function getMessageElement(message) {
     var messageElementHtml = '<div class="message">' +
         '<div class="triangle"></div>' +
@@ -211,6 +273,9 @@ function getMessageElement(message) {
     return messageElement
 }
 
+/*
+Add all loaded messages to top of list
+ */
 function addMessagesToTop(messages) {
     currentMessagesPackHeight = 0;
     messages.forEach(function (message) {
@@ -223,6 +288,9 @@ function addMessagesToTop(messages) {
     checkNewMessages();
 }
 
+/*
+Add given message to list bottom
+ */
 function addMessageToBottom(message) {
     var messageElement = getMessageElement(message);
     $('#messages').append(messageElement);
@@ -230,6 +298,9 @@ function addMessageToBottom(message) {
     $('#messages-column').animate({scrollTop: messagesHeight}, 1000);
 }
 
+/*
+Send message to current selected friend
+ */
 function sendMessage(event) {
     var messageInput = $("#message");
     if (event.keyCode == 13 ) {
