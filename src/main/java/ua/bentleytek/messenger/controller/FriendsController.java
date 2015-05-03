@@ -26,6 +26,10 @@ public class FriendsController {
 
     @RequestMapping("/online")
     public ResponseEntity<Set<Integer>> checkOnline(Principal principal){
-        return new ResponseEntity<>(userService.getOnlineFriends(principal.getName()), HttpStatus.OK);
+        if(principal != null) {
+            return new ResponseEntity<>(userService.getOnlineFriends(principal.getName()), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }

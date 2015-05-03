@@ -1,4 +1,8 @@
-var selectedFriend;//Id of current selected friend
+//Id and unreadMessages  of current selected friend
+var selectedFriend = {
+    id : 0,              //id uf current selected friend
+    unreadMessages : []  //ids of new messages from this friend
+};
 var messagesCount = 0;//Count of loaded messages to list(used for loading older messages)
 var messagesHeight = 0;//Height of messages list(used for auto scroll to bottom after receiving or sending message
 var currentMessagesPackHeight = 0;//Height of just loaded messages (used fo keep scroll in position after adding messages to top
@@ -22,14 +26,8 @@ function registerEvents() {
      */
     $('#friends').on('click', '.friend-element', function (event) {
         var id = $(event.currentTarget).attr('id');
-        $('.selected').removeClass('selected');
-        $('#' + id).addClass("selected");
-        if (id != selectedFriend) {
-            messagesCount = 0;
-            messagesHeight = 0;
-            selectedFriend = id;
-            $('#messages').empty();
-            getMessages(selectedFriend);
+        if(id != selectedFriend.id){
+            selectFriend(id)
         }
     });
 
@@ -39,6 +37,10 @@ function registerEvents() {
             getMessages(selectedFriend, messagesCount);
         }
     }));
+
+    $(document).on("click", function(){
+        clearUnread(selectedFriend);
+    });
 
     checkChangesCycle();
 }
@@ -117,9 +119,9 @@ function checkFriendsStatus() {
 Set status of given friends to online
  */
 function updateFriendsStatus(friends) {
-    for (var friendId in friends) {
+    friends.forEach(function(friendId){
         $('#' + friendId).find('div.media-body span').text('online')
-    }
+    });
 }
 
 /*
@@ -140,7 +142,7 @@ function checkNewMessages() {
         type: 'GET',
         contentType: 'application/json; charset=utf-8',
         statusCode: {
-            200: processChecked
+            200: processNewMessages
         }
     })
 }
@@ -148,11 +150,11 @@ function checkNewMessages() {
 /*
 Show count of unread messages for each friend
  */
-function processChecked(unreadMap) {
-    clearUnreadMessage();
+function processNewMessages(unreadMap) {
+    clearAllUnreadMessage();
     for (var friendId in unreadMap) {
         addUnreadMessages(friendId, unreadMap[friendId]);
-        if (friendId == selectedFriend) {
+        if (friendId == selectedFriend.id) {
             countUnread(friendId, unreadMap[friendId])
         }
     }
@@ -181,14 +183,28 @@ function countUnread(friendId, countAll) {
 /*
 Clear count of unread messages for each friend
  */
-function clearUnreadMessage() {
-    friends.forEach(function (id) {
+function clearAllUnreadMessage() {
+    friends.forEach(function(id){
+        if(id != selectedFriend) {
+            clearUnread(id)
+        }
+    })
+}
+
+/**
+ * Clear messages count from friend item
+ * @param id
+ */
+function clearUnread(id){
+        if(newMessages[id]){
+            newMessages[id].all = 0;
+            newMessages[id].loaded = 0;
+        }
         var friendElement = $('#' + id).find('.media-body h4');
         var name = $(friendElement).text();
         var pattern = /\(\d\)$/;
         name = name.replace(pattern, '');
         $(friendElement).text(name)
-    })
 }
 
 /*
@@ -208,16 +224,19 @@ function increaseValues(elementHeight) {
     messagesHeight += elementHeight + 31;
 }
 
+/**
+ * Set given friend selected and load messages for conversation with him
+ * @param id
+ */
 function selectFriend(id) {
     $('.selected').removeClass('selected');
     $('#' + id).addClass("selected");
-    if (id != selectedFriend) {
-        messagesCount = 0;
-        messagesHeight = 0;
-        selectedFriend = id;
-        $('#messages').empty();
-        getMessages(selectedFriend, messagesCount);
-    }
+    messagesCount = 0;
+    messagesHeight = 0;
+    selectedFriend.id = id;
+    $('#messages').empty();
+    getMessages(selectedFriend, messagesCount);
+
 }
 
 /*
@@ -285,7 +304,6 @@ function addMessagesToTop(messages) {
         increaseValues($(messageElement).height());
         $('#messages-column').scrollTop(currentMessagesPackHeight);
     });
-    checkNewMessages();
 }
 
 /*

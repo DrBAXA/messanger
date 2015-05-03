@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class NewMessagesCash extends Cleanable {
+public class OnlineMessagesCash extends Cleanable {
 
     @Autowired
     OnlineUsersCash usersCash;
@@ -60,12 +60,15 @@ public class NewMessagesCash extends Cleanable {
      */
     public Set<Message> get(int userId, int friendId){
         if(newMessages.containsKey(userId)){
-            Set<Message> result = newMessages.get(userId);
+            Set<Message> result = new HashSet<>();
+            result.addAll(newMessages.get(userId));
             Iterator<Message> iterator = result.iterator();
             while (iterator.hasNext()){
                 Message message = iterator.next();
                 if(message.getFrom().getId() != friendId && friendId > 0){
                     iterator.remove();
+                }else if(message.getFrom().getId() == friendId){
+                    newMessages.get(userId).remove(message);
                 }
             }
             return result;

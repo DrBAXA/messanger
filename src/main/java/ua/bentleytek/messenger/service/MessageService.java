@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.MessageDAO;
 import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
-import ua.bentleytek.messenger.service.cash.NewMessagesCash;
+import ua.bentleytek.messenger.service.cash.OnlineMessagesCash;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class MessageService {
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
-    NewMessagesCash messagesCash;
+    OnlineMessagesCash messagesCash;
 
     /**
      *
@@ -56,26 +56,24 @@ public class MessageService {
      * @param friend
      * @param first
      * @param count
-     * @param setRead
      * @return
      */
-    public Iterable<Message> getMessages(User user, User friend, int first, int count, boolean setRead){
+    public Iterable<Message> getMessages(User user, User friend, int first, int count){
         ArrayList<Message> result = new ArrayList<>();
         //Load messages from cash add to result and store to DB
         if(messagesCash.registered(user.getId()) && first == 0) {
             for(Message message : messagesCash.get(user.getId(), friend.getId())){
                 result.add(message);
-                if(setRead){
-                    read(message);
-                }
+                    message.setRead();
+                messageDAO.save(message);
             }
         }
         //Load messages from add to result and ser as read if required
         int remains = count - result.size();
         if(remains > 0){
-            for(Message message : messageDAO.getByUser(user, friend, first, remains)){
+            for(Message message : messageDAO.getByUser(user, friend, first+result.size(), remains)){
                 result.add(message);
-                if(setRead && (! message.isRead()) && message.getTo().equals(user) )
+                if((! message.isRead()) && message.getTo().equals(user) )
                     read(message);
             }
         }
@@ -101,7 +99,7 @@ public class MessageService {
      * @param message
      */
     private void read(Message message){
-        message.setRead(true);
+        message.setRead();
         messageDAO.save(message);
     }
 

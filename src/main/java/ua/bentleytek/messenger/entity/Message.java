@@ -74,7 +74,7 @@ public class Message {
         return read;
     }
 
-    public void setRead(boolean read) {
-        this.read = read;
+    public void setRead() {
+        this.read = true;
     }
 }

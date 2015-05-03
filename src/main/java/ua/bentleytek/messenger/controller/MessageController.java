@@ -23,6 +23,7 @@ public class MessageController {
 
     @Autowired
     private MessageService messageService;
+
     @Autowired
     UserService userService;
 
@@ -30,14 +31,13 @@ public class MessageController {
     public ResponseEntity<Iterable<Message>> getMessages(Principal principal,
                                                      @RequestParam("first") int first,
                                                      @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-                                                     @RequestParam(value = "friendId") int friendId,
-                                                     @RequestParam(value = "setRead", required = false, defaultValue = "true") boolean setRead)
+                                                     @RequestParam(value = "friendId") int friendId)
 
     {
         if(principal != null) {
             User user = userService.getUser(principal.getName());
             User friend = userService.getUser(friendId);
-            Iterable<Message> messages = messageService.getMessages(user, friend, first, count, setRead);
+            Iterable<Message> messages = messageService.getMessages(user, friend, first, count);
             return new ResponseEntity<>(messages, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -62,4 +62,8 @@ public class MessageController {
         }
 
     }
+
+    @RequestMapping("/read")
+    public ResponseEntity<Void> markAsRead(Principal principal,
+                                           @)
 }
