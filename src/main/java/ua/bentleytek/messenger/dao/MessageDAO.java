@@ -14,5 +14,4 @@ public interface MessageDAO extends CrudRepository<Message, Integer> {
 
     @Query(value = "SELECT * FROM messages WHERE  user_to = ?1 AND is_read = 0", nativeQuery = true)
     Iterable<Message> getUnread(User user);
-
 }

@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.MessageDAO;
 import ua.bentleytek.messenger.entity.Message;
+import ua.bentleytek.messenger.util.ByDateMessageComparator;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -27,7 +25,7 @@ public class OnlineMessagesCash extends Cleanable {
      */
     public void register(int id){
         if(! newMessages.containsKey(id)){
-            newMessages.put(id, new HashSet<Message>());
+            newMessages.put(id, new TreeSet<>(new ByDateMessageComparator()));
         }
     }
 
@@ -55,39 +53,46 @@ public class OnlineMessagesCash extends Cleanable {
     }
 
     /**
-     * @return  set of new messages for given userId received from given friend
-     * or all friends if friendId <= 0
+     * @return  last count messages from conversation between user and friend given by their id
      */
-    public Set<Message> get(int userId, int friendId){
-        if(newMessages.containsKey(userId)){
-            Set<Message> result = new HashSet<>();
-            result.addAll(newMessages.get(userId));
-            Iterator<Message> iterator = result.iterator();
-            while (iterator.hasNext()){
-                Message message = iterator.next();
-                if(message.getFrom().getId() != friendId && friendId > 0){
-                    iterator.remove();
-                }else if(message.getFrom().getId() == friendId){
-                    newMessages.get(userId).remove(message);
+    public Set<Message> get(int userId, int friendId, int count){
+
+        Set<Message> result = new TreeSet<>(new ByDateMessageComparator());
+        Set<Message> buffer = new TreeSet<>(new ByDateMessageComparator());
+
+        if(newMessages.containsKey(userId)) {
+            //Put to result messages sent from friend to this user
+            for (Message message : newMessages.get(userId)) {
+                if (message.getFrom().getId() == friendId) {
+                    buffer.add(message);
                 }
             }
-            return result;
-        }else {
-            return null;
         }
+        if(newMessages.containsKey(friendId)){
+            //Put to result messages sent  from this user to friend
+            for(Message message : newMessages.get(friendId)){
+                if(message.getFrom().getId() == friendId){
+                    buffer.add(message);
+                }
+            }
+        }
+        Iterator<Message> messageIterator = buffer.iterator();
+        while (messageIterator.hasNext() && count-- >0){
+            result.add(messageIterator.next());
+        }
+        return result;
     }
 
     /**
-     * @param id
-     * @return count of new messages for given user
-     *         -1 if that user is not in
+     * Returns all messages that was sent to this user
+     * @param userId
+     * @return
      */
-    public int getCount(int id){
-        if(newMessages.containsKey(id)){
-            return newMessages.get(id).size();
-        }else {
-            return -1;
+    public Set<Message> get(int userId){
+        if(newMessages.containsKey(userId)){
+            return newMessages.get(userId);
         }
+        return null;
     }
 
     /**
@@ -106,6 +111,26 @@ public class OnlineMessagesCash extends Cleanable {
                 messageDAO.save(newMessages.get(id));
                 iterator.remove();
             }
+        }
+    }
+
+    /**
+     * Save to DB, set as read and delete from cash messages to userId from friendId
+     * @param userId
+     * @param friendId
+     */
+    public void markRead(int userId, int friendId){
+        if(newMessages.containsKey(userId)){
+            Iterator<Message> iterator = newMessages.get(userId).iterator();
+            while (iterator.hasNext()){
+                Message message = iterator.next();
+                if(message.getFrom().getId() == friendId){
+                    message.setRead();
+                    messageDAO.save(message);
+                    iterator.remove();
+                }
+            }
+
         }
     }
 }

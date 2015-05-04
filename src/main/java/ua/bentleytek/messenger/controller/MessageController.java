@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
 import ua.bentleytek.messenger.service.MessageService;
@@ -56,14 +53,21 @@ public class MessageController {
     public ResponseEntity<Map<Integer, Integer>> checkNewMessages(Principal principal){
         if(principal != null) {
             User user = userService.getUser(principal.getName());
-            return new ResponseEntity<>(messageService.getUnread(user), HttpStatus.OK);
+            return new ResponseEntity<>(messageService.getUnreadCountBySender(user), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
     }
 
-    @RequestMapping("/read")
+    @RequestMapping("/read/{friendId}")
     public ResponseEntity<Void> markAsRead(Principal principal,
-                                           @)
+                                           @PathVariable("friendId") int friendId){
+        if(principal != null){
+            User user = userService.getUser(principal.getName());
+            messageService.read(user.getId(), friendId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
 }

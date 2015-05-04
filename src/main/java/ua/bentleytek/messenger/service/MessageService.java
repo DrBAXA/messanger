@@ -26,11 +26,11 @@ public class MessageService {
      * @param user
      * @return count unread messages for each user that sent still unread message
      */
-    public Map<Integer, Integer> getUnread(User user){
+    public Map<Integer, Integer> getUnreadCountBySender(User user){
         Iterable<Message> messages;
 
         if(messagesCash.registered(user.getId())){
-            messages = messagesCash.get(user.getId(), 0);
+            messages = messagesCash.get(user.getId());
         }else {
             messagesCash.register(user.getId());
             messages = messageDAO.getUnread(user);
@@ -60,12 +60,10 @@ public class MessageService {
      */
     public Iterable<Message> getMessages(User user, User friend, int first, int count){
         ArrayList<Message> result = new ArrayList<>();
-        //Load messages from cash add to result and store to DB
+        //Load messages from cash add to result
         if(messagesCash.registered(user.getId()) && first == 0) {
-            for(Message message : messagesCash.get(user.getId(), friend.getId())){
+            for(Message message : messagesCash.get(user.getId(), friend.getId(), count)){
                 result.add(message);
-                    message.setRead();
-                messageDAO.save(message);
             }
         }
         //Load messages from add to result and ser as read if required
@@ -95,7 +93,15 @@ public class MessageService {
     }
 
     /**
-     * Mark message as read and save to DB
+     * Set messages from friend to user as read
+     * @param userId
+     * @param friendId
+     */
+    public void read(int userId, int friendId){
+        messagesCash.markRead(userId, friendId);
+    }
+    /**
+     * Mark message as read
      * @param message
      */
     private void read(Message message){

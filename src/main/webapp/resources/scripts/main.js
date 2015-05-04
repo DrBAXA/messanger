@@ -1,13 +1,31 @@
 //Id and unreadMessages  of current selected friend
 var selectedFriend = {
     id : 0,              //id uf current selected friend
-    unreadMessages : []  //ids of new messages from this friend
+    unreadMessages : {
+        all: 0,
+        loaded: 0
+    },  //ids of new messages from this friend
+    getAllUnread: function(){
+        return this.unreadMessages.all;
+    },
+    setAllUnread: function(count){
+        this.unreadMessages.all = count;
+    },
+    incLoaded: function(){
+        this.unreadMessages.loaded++
+    },
+    getToLoad: function(){
+        return this.unreadMessages.all - this.unreadMessages.loaded;
+    },
+    clear: function(){
+        this.unreadMessages.all = 0;
+        this.unreadMessages.loaded = 0;
+    }
 };
 var messagesCount = 0;//Count of loaded messages to list(used for loading older messages)
 var messagesHeight = 0;//Height of messages list(used for auto scroll to bottom after receiving or sending message
 var currentMessagesPackHeight = 0;//Height of just loaded messages (used fo keep scroll in position after adding messages to top
 var friends = [];//Friends id
-var newMessages = {};//Count all unread messages and already loaded unread messages for each friends
 
 $(document).ready(
     function () {
@@ -34,12 +52,14 @@ function registerEvents() {
     //Auto load older messages if scroll is in top of list
     $('#messages-column').scroll($.debounce(500, function () {
         if ($(this).scrollTop() == 0) {
-            getMessages(selectedFriend, messagesCount);
+            getMessages(selectedFriend.id, messagesCount);
         }
     }));
 
     $(document).on("click", function(){
-        clearUnread(selectedFriend);
+        markRead(selectedFriend.id);
+        selectedFriend.clear();
+        clearUnread(selectedFriend.id);
     });
 
     checkChangesCycle();
@@ -80,7 +100,7 @@ Add each friend to document
 function addFriendElement(friend) {
     var friendElement = getFriendElement(friend);
     $('#friends').append(friendElement);
-    friends.push(friend.id)
+    friends[friend.id] = 0;
 }
 /*
 Create friends element from html
@@ -128,9 +148,9 @@ function updateFriendsStatus(friends) {
 Set status of all friends to offline
  */
 function clearFriendsStatus() {
-    friends.forEach(function (friendId) {
+    for(var friendId in friends){
         $('#' + friendId).find('div.media-body span').text('')
-    })
+    }
 }
 
 /*
@@ -153,42 +173,26 @@ Show count of unread messages for each friend
 function processNewMessages(unreadMap) {
     clearAllUnreadMessage();
     for (var friendId in unreadMap) {
+        friends[friendId] = unreadMap[friendId];
         addUnreadMessages(friendId, unreadMap[friendId]);
         if (friendId == selectedFriend.id) {
-            countUnread(friendId, unreadMap[friendId])
+            selectedFriend.setAllUnread(unreadMap[friendId]);
+            var unloaded = selectedFriend.getToLoad();
+            if(unloaded > 0) {
+                loadNewMessages(selectedFriend.id, unloaded);
+            }
         }
     }
 }
 
-/*
-Updating count of unread messages for each friend
-and loading new messages for current selected friend
- */
-function countUnread(friendId, countAll) {
-    if (friendId in newMessages) {
-        newMessages[friendId].all = countAll;
-        if(countAll == 0){
-            newMessages[friendId].loaded = 0;
-        }
-        var toLoad = countAll - newMessages[friendId].loaded;
-        if (toLoad > 0) {
-            loadNewMessages(friendId, toLoad)
-        }
-    } else {
-        newMessages[friendId] = {  all: countAll, loaded: 0};
-        loadNewMessages(friendId, countAll)
-    }
-}
 
 /*
 Clear count of unread messages for each friend
  */
 function clearAllUnreadMessage() {
-    friends.forEach(function(id){
-        if(id != selectedFriend) {
-            clearUnread(id)
-        }
-    })
+    for(var friendId in friends){
+        clearUnread(friendId);
+    }
 }
 
 /**
@@ -196,15 +200,26 @@ function clearAllUnreadMessage() {
  * @param id
  */
 function clearUnread(id){
-        if(newMessages[id]){
-            newMessages[id].all = 0;
-            newMessages[id].loaded = 0;
-        }
-        var friendElement = $('#' + id).find('.media-body h4');
-        var name = $(friendElement).text();
-        var pattern = /\(\d\)$/;
-        name = name.replace(pattern, '');
-        $(friendElement).text(name)
+    var friendElement = $('#' + id).find('.media-body h4');
+    var name = $(friendElement).text();
+    var pattern = /\(\d+\)$/;
+    name = name.replace(pattern, '');
+    $(friendElement).text(name);
+}
+
+/**
+ * Send request to server about reading messages from user with given id
+ * @param id
+ */
+function markRead(id){
+    if(selectedFriend.getAllUnread() > 0){
+        selectedFriend.clear();
+        friends[id] = 0;
+        $.ajax({
+            url: getHomeUrl() + 'messages/read/' + id,
+            type: 'POST'
+        })
+    }
 }
 
 /*
@@ -233,10 +248,12 @@ function selectFriend(id) {
     $('#' + id).addClass("selected");
     messagesCount = 0;
     messagesHeight = 0;
+    selectedFriend.clear();
     selectedFriend.id = id;
+    selectedFriend.setAllUnread(friends[id]);
     $('#messages').empty();
-    getMessages(selectedFriend, messagesCount);
-
+    getMessages(id, messagesCount);
+    markRead(id);
 }
 
 /*
@@ -249,8 +266,11 @@ function loadNewMessages(friendId, count) {
         contentType: 'application/json; charset=utf-8',
         statusCode: {
             200: function (messages) {
-                newMessages[friendId].loaded += messages.length;
-                messages.reverse().forEach(addMessageToBottom)
+                    messages.reverse().forEach(function(message){
+                        selectedFriend.incLoaded();
+                        //friends[selectedFriend.id]--;
+                        addMessageToBottom(message);
+                    })
             }
         }
     })
@@ -281,7 +301,7 @@ function getMessageElement(message) {
         '</div>';
     var messageElement = $.parseHTML(messageElementHtml);
 
-    if (message.to.id == selectedFriend) {
+    if (message.to.id == selectedFriend.id) {
         $(messageElement).addClass('my-message');
         $(messageElement).find('div.triangle').addClass('right-triangle')
     } else {
@@ -328,7 +348,7 @@ function sendMessage(event) {
             var message = {
                 text: text,
                 date: Date.now(),
-                to: {id: selectedFriend}
+                to: {id: selectedFriend.id}
             };
 
             $.ajax({
