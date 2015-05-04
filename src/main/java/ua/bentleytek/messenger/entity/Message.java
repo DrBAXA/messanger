@@ -34,9 +34,9 @@ public class Message {
         return id;
     }
 
-    public void setId(int id) {
+    /*public void setId(int id) {
         this.id = id;
-    }
+    }*/
 
     public String getText() {
         return text;
@@ -74,7 +74,27 @@ public class Message {
         return read;
     }
 
-    public void setRead(boolean read) {
-        this.read = read;
+    public void setRead() {
+        this.read = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Message)) return false;
+
+        Message message = (Message) o;
+
+        if (!date.equals(message.date)) return false;
+        if (!text.equals(message.text)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = text.hashCode();
+        result = 31 * result + date.hashCode();
+        return result;
     }
 }

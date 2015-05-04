@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
+import ua.bentleytek.messenger.service.cash.OnlineUsersCash;
 
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,15 @@ public class UserService {
             user.setLastVisit();
             onlineUsersCash.add(user);
         }
+    }
+
+    /**
+     * @param id
+     * @return status of given user
+     * don't ask a DB
+     */
+    public boolean isOnLine(int id){
+        return onlineUsersCash.contains(id);
     }
 
     /**

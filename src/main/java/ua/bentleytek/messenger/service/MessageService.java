@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.MessageDAO;
 import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
+import ua.bentleytek.messenger.service.cash.OnlineMessagesCash;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,13 +16,26 @@ import java.util.Map;
  */
 @Service
 public class MessageService {
-    private static final int DEFAULT_PAGE_COUNT = 10;
-
     @Autowired
     private MessageDAO messageDAO;
+    @Autowired
+    OnlineMessagesCash messagesCash;
 
-    public Map<Integer, Integer> getUnread(User user){
-        Iterable<Message> messages = messageDAO.getUnread(user);
+    /**
+     *
+     * @param user
+     * @return count unread messages for each user that sent still unread message
+     */
+    public Map<Integer, Integer> getUnreadCountBySender(User user){
+        Iterable<Message> messages;
+
+        if(messagesCash.registered(user.getId())){
+            messages = messagesCash.get(user.getId());
+        }else {
+            messagesCash.register(user.getId());
+            messages = messageDAO.getUnread(user);
+        }
+
         Map<Integer, Integer> result = new HashMap<>();
         for (Message message : messages){
             int userID = message.getFrom().getId();
@@ -33,25 +48,64 @@ public class MessageService {
         return result;
     }
 
-    public Iterable<Message> getMessages(User user, User friend, int first, boolean setRead){
-        return getMessages(user, friend, first, DEFAULT_PAGE_COUNT, setRead);
-    }
-
-    public Iterable<Message> getMessages(User user, User friend, int first, int count, boolean setRead){
-        Iterable<Message> messages = messageDAO.getByUser(user, friend, first, count);
-        for(Message message : messages){
-            if(setRead && (! message.isRead()) && message.getTo().equals(user) )
-                read(message);
+    /**
+     * Get messages that is sent to given user from given friend
+     * Get its both from cash and DB
+     * if first is more than 0(e.i. loads old messages) cash will not be used
+     * @param user
+     * @param friend
+     * @param first
+     * @param count
+     * @return
+     */
+    public Iterable<Message> getMessages(User user, User friend, int first, int count){
+        ArrayList<Message> result = new ArrayList<>();
+        //Load messages from cash add to result
+        if(messagesCash.registered(user.getId()) && first == 0) {
+            for(Message message : messagesCash.get(user.getId(), friend.getId(), count)){
+                result.add(message);
+            }
         }
-        return messages;
+        //Load messages from add to result and ser as read if required
+        int remains = count - result.size();
+        if(remains > 0){
+            for(Message message : messageDAO.getByUser(user, friend, first+result.size(), remains)){
+                result.add(message);
+                if((! message.isRead()) && message.getTo().equals(user) )
+                    read(message);
+            }
+        }
+        return result;
     }
 
+    /**
+     * If receiver is registered in cash(e.i. online) message will be added to cash
+     * otherwise to DB
+     * @param message
+     */
     public void addMessage(Message message){
-        messageDAO.save(message);
+        int userId = message.getTo().getId();
+        if(messagesCash.registered(userId)){
+            messagesCash.put(message);
+        }else {
+            messageDAO.save(message);
+        }
     }
 
+    /**
+     * Set messages from friend to user as read
+     * @param userId
+     * @param friendId
+     */
+    public void read(int userId, int friendId){
+        messagesCash.markRead(userId, friendId);
+    }
+    /**
+     * Mark message as read
+     * @param message
+     */
     private void read(Message message){
-        message.setRead(true);
+        message.setRead();
         messageDAO.save(message);
     }
 

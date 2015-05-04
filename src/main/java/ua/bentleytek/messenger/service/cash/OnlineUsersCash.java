@@ -1,22 +1,19 @@
-package ua.bentleytek.messenger.service;
+package ua.bentleytek.messenger.service.cash;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
 
-import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class OnlineUsersCash {
+public class OnlineUsersCash extends Cleanable {
     @Autowired
     UsersDAO usersDAO;
-
-    private Thread cleaner;
 
     private Map<Integer, User> onLineById = new ConcurrentHashMap<>();
     private Map<String, Integer> onLineByName = new ConcurrentHashMap<>();
@@ -57,7 +54,7 @@ public class OnlineUsersCash {
         return result;
     }
 
-    private void refresh(){
+    public void clean(){
         for(Integer id : onLineById.keySet()){
             User user = onLineById.get(id);
             if(! user.isOnline()){
@@ -68,23 +65,4 @@ public class OnlineUsersCash {
         }
     }
 
-    @PostConstruct
-    private void runCleaner(){
-        cleaner = new Cleaner();
-        cleaner.start();
-    }
-
-    private class Cleaner extends Thread{
-        @Override
-        public void run(){
-            while (! isInterrupted()){
-                refresh();
-                try {
-                    sleep(60000);
-                } catch (InterruptedException ie) {
-                    //do nothing
-                }
-            }
-        }
-    }
 }

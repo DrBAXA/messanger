@@ -50,6 +50,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 
     @Override
     public void addInterceptors(InterceptorRegistry interceptorRegistry){
-        interceptorRegistry.addInterceptor(new UserInterceptor()).addPathPatterns("/");
+        interceptorRegistry.addInterceptor(new UserInterceptor()).addPathPatterns("/**");
     }
 }
