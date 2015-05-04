@@ -3,8 +3,7 @@ package ua.bentleytek.messenger.validator;
 
 public enum UniqueField {
     NAME("name"),
-    EMAIL("email"),
-    PHONE("phone");
+    EMAIL("email");
 
     private final String value;
 

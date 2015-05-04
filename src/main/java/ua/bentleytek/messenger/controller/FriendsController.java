@@ -20,12 +20,21 @@ public class FriendsController {
     UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<Iterable<User>> getFriends(Principal user){
-        return new ResponseEntity<Iterable<User>>(userService.getFriends(user.getName()), HttpStatus.OK);
+    public ResponseEntity<Iterable<User>> getFriends(Principal principal) {
+        if (principal != null) {
+            return new ResponseEntity<Iterable<User>>(userService.getFriends(principal.getName()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @RequestMapping("/online")
-    public ResponseEntity<Set<Integer>> checkOnline(Principal principal){
-        return new ResponseEntity<>(userService.getOnlineFriends(principal.getName()), HttpStatus.OK);
+    public ResponseEntity<Set<Integer>> checkOnline(Principal principal) {
+        if (principal != null) {
+            return new ResponseEntity<>(userService.getOnlineFriends(principal.getName()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
     }
 }

@@ -2,7 +2,6 @@ package ua.bentleytek.messenger.validator;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.UsersDAO;
 
@@ -12,7 +11,6 @@ import javax.validation.ConstraintValidatorContext;
 @Service
 public class UserFieldUniqueValidator implements ConstraintValidator<Unique, String>{
 
-    @Qualifier("usersDAO")
     @Autowired
     UsersDAO usersDAO;
 

@@ -1,7 +1,9 @@
 package ua.bentleytek.messenger.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,7 +20,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
-    DataSource dataSource;
+    private DataSource dataSource;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     public void configGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -28,6 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .usersByUsernameQuery("SELECT name, password, enabled FROM users WHERE name=?")
                 .authoritiesByUsernameQuery("SELECT name, role FROM users WHERE name=?");
     }
+
 
 
     @Override
@@ -53,4 +57,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
     }
+
+    @Bean
+    @Autowired
+    public AuthenticationManager getAuthenticationManager(AuthenticationManagerBuilder auth){
+        return auth.getOrBuild();
+    }
+
 }

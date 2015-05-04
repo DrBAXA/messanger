@@ -42,6 +42,7 @@ public class UserService {
     }
 
     public void addUser(User user){
+        user.setEnabled(true);
         user.setRole(DEFAULT_USER_ROLE);
         String rawPassword = user.getPassword();
         String codedPassword = passwordEncoder.encode(rawPassword);

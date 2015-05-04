@@ -49,7 +49,7 @@ public class User implements Serializable{
 
     @JsonIgnore
     @Column(name="enabled")
-    private int enabled;
+    private boolean enabled;
 
     @Column(name = "last_visit")
     private Timestamp lastVisit;
@@ -104,11 +104,11 @@ public class User implements Serializable{
         return role;
     }
 
-    public int getEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(int enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 

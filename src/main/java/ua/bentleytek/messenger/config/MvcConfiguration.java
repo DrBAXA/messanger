@@ -24,7 +24,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 		return resolver;
 	}
 
-	private static final int MAX_UPLOAD_SIZE = 700*1024;//700 kB
+	private static final int MAX_UPLOAD_SIZE = 3*1024*1024;//3 MB
 
 	@Bean
 	public CommonsMultipartResolver  multipartResolver(){
