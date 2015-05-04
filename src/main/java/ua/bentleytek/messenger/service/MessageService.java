@@ -109,4 +109,12 @@ public class MessageService {
         messageDAO.save(message);
     }
 
+    /**
+     * @param userId
+     * @return true if since last check new messages received and false otherwise.
+     */
+    public boolean hasNew(int userId){
+        return messagesCash.hasNew(userId);
+    }
+
 }

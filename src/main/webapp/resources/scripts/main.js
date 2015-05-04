@@ -68,7 +68,7 @@ function registerEvents() {
 Init updating data each 10 seconds;
  */
 function checkChangesCycle() {
-    setInterval(checkNewMessages, 10000);
+    //setInterval(checkNewMessages, 10000);
     setInterval(checkFriendsStatus, 10000);
 }
 
@@ -161,8 +161,10 @@ function checkNewMessages() {
         url: getHomeUrl() + 'messages/unread',
         type: 'GET',
         contentType: 'application/json; charset=utf-8',
-        statusCode: {
-            200: processNewMessages
+        error: checkNewMessages,
+        success: function(data){
+            processNewMessages(data);
+            checkNewMessages();
         }
     })
 }

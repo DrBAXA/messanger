@@ -8,6 +8,7 @@ import ua.bentleytek.messenger.util.ByDateMessageComparator;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class OnlineMessagesCash extends Cleanable {
@@ -18,6 +19,7 @@ public class OnlineMessagesCash extends Cleanable {
     MessageDAO messageDAO;
 
     private Map<Integer, Set<Message>> newMessages = new ConcurrentHashMap<>();
+    private Map<Integer, AtomicBoolean> changes = new ConcurrentHashMap<>();
 
     /**
      * Add user in cash
@@ -26,6 +28,7 @@ public class OnlineMessagesCash extends Cleanable {
     public void register(int id){
         if(! newMessages.containsKey(id)){
             newMessages.put(id, new TreeSet<>(new ByDateMessageComparator()));
+            changes.put(id, new AtomicBoolean(false));
         }
     }
 
@@ -47,6 +50,7 @@ public class OnlineMessagesCash extends Cleanable {
         int userId = message.getTo().getId();
         if(newMessages.containsKey(userId)){
             newMessages.get(userId).add(message);
+            changes.get(userId).set(true);
             return true;
         }
         return false;
@@ -96,6 +100,14 @@ public class OnlineMessagesCash extends Cleanable {
     }
 
     /**
+     * @param userId
+     * @return true if since last check new messages received and false otherwise.
+     */
+    public boolean hasNew(int userId){
+        return changes.containsKey(userId) ?  changes.get(userId).getAndSet(false) : false;
+    }
+
+    /**
      * Save to DB and delete from cash messages to users that there isn't online
      */
     public void clean(){
@@ -110,6 +122,7 @@ public class OnlineMessagesCash extends Cleanable {
             if(! usersCash.contains(id)){
                 messageDAO.save(newMessages.get(id));
                 iterator.remove();
+                changes.remove(id);
             }
         }
     }

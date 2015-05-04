@@ -7,22 +7,27 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
-import ua.bentleytek.messenger.service.MessageService;
-import ua.bentleytek.messenger.service.UserService;
+import ua.bentleytek.messenger.service.*;
 
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.Map;
 
+import static ua.bentleytek.messenger.service.EventType.*;
+
 @Controller
 @RequestMapping("/messages")
 public class MessageController {
 
+    public static final int LONG_QUERY_TIMEOUT = 1000000;
     @Autowired
     private MessageService messageService;
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    LongQueryEventHandler eventHandler;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Iterable<Message>> getMessages(Principal principal,
@@ -43,21 +48,42 @@ public class MessageController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> addMessage(@RequestBody Message message, Principal user){
-        message.setFrom(userService.getUser(user.getName()));
-        message.setDate(new Timestamp(System.currentTimeMillis()));
-        messageService.addMessage(message);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(user != null) {
+            message.setFrom(userService.getUser(user.getName()));
+            message.setDate(new Timestamp(System.currentTimeMillis()));
+            messageService.addMessage(message);
+            eventHandler.setEvent(message.getTo().getId());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
+    //Long query
     @RequestMapping("/unread")
     public ResponseEntity<Map<Integer, Integer>> checkNewMessages(Principal principal){
         if(principal != null) {
             User user = userService.getUser(principal.getName());
-            return new ResponseEntity<>(messageService.getUnreadCountBySender(user), HttpStatus.OK);
+            Map<Integer, Integer> result;
+            if(messageService.hasNew(user.getId())) {
+                result = messageService.getUnreadCountBySender(user);
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            }else{
+                Event event = new Event(NEW_MESSAGE);
+                synchronized (event){
+                    eventHandler.subscribe(user.getId(), event);
+                    try {
+                        event.wait(LONG_QUERY_TIMEOUT);
+                        result = messageService.getUnreadCountBySender(user);
+                        return new ResponseEntity<>(result, HttpStatus.OK);
+                    } catch (InterruptedException ie) {
+                        return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+                    }
+                }
+            }
         }else{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
     }
 
     @RequestMapping("/read/{friendId}")
