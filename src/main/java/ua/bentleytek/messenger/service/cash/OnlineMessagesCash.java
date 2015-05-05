@@ -75,7 +75,7 @@ public class OnlineMessagesCash extends Cleanable {
         if(newMessages.containsKey(friendId)){
             //Put to result messages sent  from this user to friend
             for(Message message : newMessages.get(friendId)){
-                if(message.getFrom().getId() == friendId){
+                if(message.getFrom().getId() == userId){
                     buffer.add(message);
                 }
             }
@@ -105,6 +105,12 @@ public class OnlineMessagesCash extends Cleanable {
      */
     public boolean hasNew(int userId){
         return changes.containsKey(userId) ?  changes.get(userId).getAndSet(false) : false;
+    }
+
+    public void resetNew(int userId){
+        if(changes.containsKey(userId)) {
+            changes.get(userId).set(false);
+        }
     }
 
     /**

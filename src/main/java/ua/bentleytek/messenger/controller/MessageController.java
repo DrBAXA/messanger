@@ -7,13 +7,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
-import ua.bentleytek.messenger.service.*;
+import ua.bentleytek.messenger.service.Event;
+import ua.bentleytek.messenger.service.LongQueryEventService;
+import ua.bentleytek.messenger.service.MessageService;
+import ua.bentleytek.messenger.service.UserService;
 
 import java.security.Principal;
-import java.sql.Timestamp;
 import java.util.Map;
 
-import static ua.bentleytek.messenger.service.EventType.*;
+import static ua.bentleytek.messenger.service.EventType.NEW_MESSAGE;
 
 @Controller
 @RequestMapping("/messages")
@@ -27,7 +29,7 @@ public class MessageController {
     UserService userService;
 
     @Autowired
-    LongQueryEventHandler eventHandler;
+    LongQueryEventService eventHandler;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Iterable<Message>> getMessages(Principal principal,
@@ -50,7 +52,6 @@ public class MessageController {
     public ResponseEntity<Void> addMessage(@RequestBody Message message, Principal user){
         if(user != null) {
             message.setFrom(userService.getUser(user.getName()));
-            message.setDate(new Timestamp(System.currentTimeMillis()));
             messageService.addMessage(message);
             eventHandler.setEvent(message.getTo().getId());
             return new ResponseEntity<>(HttpStatus.OK);
@@ -62,20 +63,19 @@ public class MessageController {
     //Long query
     @RequestMapping("/unread")
     public ResponseEntity<Map<Integer, Integer>> checkNewMessages(Principal principal){
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!unread");
         if(principal != null) {
             User user = userService.getUser(principal.getName());
-            Map<Integer, Integer> result;
             if(messageService.hasNew(user.getId())) {
-                result = messageService.getUnreadCountBySender(user);
-                return new ResponseEntity<>(result, HttpStatus.OK);
+                return new ResponseEntity<>(messageService.getUnreadCountBySender(user), HttpStatus.OK);
             }else{
                 Event event = new Event(NEW_MESSAGE);
                 synchronized (event){
                     eventHandler.subscribe(user.getId(), event);
                     try {
                         event.wait(LONG_QUERY_TIMEOUT);
-                        result = messageService.getUnreadCountBySender(user);
-                        return new ResponseEntity<>(result, HttpStatus.OK);
+                        messageService.resetNew(user.getId());
+                        return new ResponseEntity<>(messageService.getUnreadCountBySender(user), HttpStatus.OK);
                     } catch (InterruptedException ie) {
                         return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
                     }

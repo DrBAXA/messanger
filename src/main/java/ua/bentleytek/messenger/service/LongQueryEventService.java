@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class LongQueryEventHandler {
+public class LongQueryEventService {
     private Map<Integer, Event> eventMap = new ConcurrentHashMap<>();
 
     public void setEvent(int userId){

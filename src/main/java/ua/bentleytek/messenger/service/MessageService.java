@@ -7,6 +7,7 @@ import ua.bentleytek.messenger.entity.Message;
 import ua.bentleytek.messenger.entity.User;
 import ua.bentleytek.messenger.service.cash.OnlineMessagesCash;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class MessageService {
     private MessageDAO messageDAO;
     @Autowired
     OnlineMessagesCash messagesCash;
+    @Autowired
+    LongQueryEventService eventHandler;
 
     /**
      *
@@ -34,6 +37,9 @@ public class MessageService {
         }else {
             messagesCash.register(user.getId());
             messages = messageDAO.getUnread(user);
+            for(Message message:messages) {
+                messagesCash.get(user.getId()).add(message);
+            }
         }
 
         Map<Integer, Integer> result = new HashMap<>();
@@ -84,8 +90,9 @@ public class MessageService {
      * @param message
      */
     public void addMessage(Message message){
-        int userId = message.getTo().getId();
-        if(messagesCash.registered(userId)){
+        message.setDate(new Timestamp(System.currentTimeMillis()));
+        int userToId = message.getTo().getId();
+        if(messagesCash.registered(userToId)){
             messagesCash.put(message);
         }else {
             messageDAO.save(message);
@@ -115,6 +122,10 @@ public class MessageService {
      */
     public boolean hasNew(int userId){
         return messagesCash.hasNew(userId);
+    }
+
+    public void resetNew(int userId){
+        messagesCash.resetNew(userId);
     }
 
 }
