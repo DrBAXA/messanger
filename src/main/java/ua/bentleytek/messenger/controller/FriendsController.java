@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import ua.bentleytek.messenger.entity.User;
 import ua.bentleytek.messenger.service.UserService;
 
@@ -36,5 +38,34 @@ public class FriendsController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
+    }
+
+    @RequestMapping("/find")
+    public ResponseEntity<User> find(@RequestParam String nameOrEmail){
+        User user = userService.find(nameOrEmail);
+        if(user != null){
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/invitation/{id}", method = RequestMethod.POST)
+    public ResponseEntity<Void> addInvitation(Principal principal,
+                                           @PathVariable("id") int userId)
+    {
+        if(userService.addInvitation(principal.getName(), userId)){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        }
+    }
+    @RequestMapping("/invitation")
+    public ResponseEntity<Set<User>> getInvitations(Principal principal){
+        if(principal != null){
+            Set<User> invitations = userService.getUser(principal.getName()).getFriendInvitations();
+            return new ResponseEntity<>(invitations, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 }

@@ -28,6 +28,11 @@
                 <ul class="media-list" id="friends">
 
                 </ul>
+                <div class="find-friend">
+                    <form onsubmit="return findFriend()">
+                        <input type="text" id="find" class="find-friend-input" placeholder="Знайти більше по e-mail чи ніку ... ">
+                    </form>
+                </div>
             </div>
             <div class="col-lg-8 col-md-8 column messages-column" id="messages-column">
                 <div class="messages" id="messages">
@@ -36,6 +41,20 @@
             </div>
             <div class="col-lg-8 col-lg-offset-4 col-md-8 col-md-offset-4 new-message-box">
                     <input class="message-text" id="message" placeholder="напишіть повідомлення ..." onkeyup="sendMessage(event)">
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="find-friend-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body" id="found">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Відмінити</button>
+                        <button type="button" id="invitation" class="btn btn-primary">Надіслати запрошення</button>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

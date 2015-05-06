@@ -88,12 +88,32 @@ public class UserService {
     }
 
     /**
-     * Load users friends from DB instead of use FetchType.EAGER
+     * Load users friends and invitations from DB before adding to cash to prevent LazyInitializationException
+     * instead of use FetchType.EAGER
      * because FetchType.EAGER loads friends recursively
-     * i.e. loads friends of friends
+     * i.e. loads friends of friends.
      * @param user
      */
     private void initFriends(User user){
         System.out.println(user.getFriends().size());
+        System.out.println(user.getFriendInvitations().size());
+    }
+
+    public User find(String nameOrEmail) {
+        return usersDAO.getByNameOrEmail(nameOrEmail);
+    }
+
+    /**
+     * Add user given by invitorName to invitationSet of user given by userId
+     * @param invitorName
+     * @param userId
+     * @return true if adde or false if already presented in this set
+     */
+    public boolean addInvitation(String invitorName, int userId) {
+        User invitor = getUser(invitorName);
+        User user = getUser(userId);
+        boolean result = user.getFriendInvitations().add(invitor);
+        usersDAO.save(user);
+        return result;
     }
 }

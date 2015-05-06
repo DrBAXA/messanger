@@ -13,13 +13,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class OnlineMessagesCash extends Cleanable {
 
-    @Autowired
-    OnlineUsersCash usersCash;
-    @Autowired
-    MessageDAO messageDAO;
+    private OnlineUsersCash usersCash;
+    private MessageDAO messageDAO;
 
     private Map<Integer, Set<Message>> newMessages = new ConcurrentHashMap<>();
     private Map<Integer, AtomicBoolean> changes = new ConcurrentHashMap<>();
+
+    @Autowired
+    public OnlineMessagesCash(OnlineUsersCash usersCash, MessageDAO messageDAO) {
+        this.usersCash = usersCash;
+        this.messageDAO = messageDAO;
+    }
 
     /**
      * Add user in cash
@@ -96,7 +100,7 @@ public class OnlineMessagesCash extends Cleanable {
         if(newMessages.containsKey(userId)){
             return newMessages.get(userId);
         }
-        return null;
+        return Collections.EMPTY_SET;
     }
 
     /**

@@ -38,7 +38,7 @@ public class MessageService {
             messagesCash.register(user.getId());
             messages = messageDAO.getUnread(user);
             for(Message message:messages) {
-                messagesCash.get(user.getId()).add(message);
+                messagesCash.put(message);
             }
         }
 

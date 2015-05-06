@@ -72,6 +72,37 @@ function checkChangesCycle() {
     setInterval(checkFriendsStatus, 10000);
 }
 
+function findFriend(){
+    var nameOrEmail = $('#find');
+    $.ajax({
+        url: getHomeUrl() + 'friends/find?nameOrEmail=' +nameOrEmail.val(),
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: function(data){
+                nameOrEmail.val('');
+                showFound(data);
+            }
+        }
+    });
+    return false
+}
+
+function showFound(user){
+    var userElement = createFriendElement(user);
+    var modalContainer = $('#found');
+    modalContainer.empty();
+    modalContainer.append(userElement);
+    if(user.id in friends){
+        $('#invitation').attr('disabled', true);
+    }
+    $('#find-friend-modal').modal('toggle');
+}
+
+function sandInvitation(userId){
+
+}
+
 /*
  Request to get list of friends
  */

@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="users")
@@ -64,6 +65,13 @@ public class User implements Serializable{
                 inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")})
     private List<User> friends;
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable( name = "invitations",
+            joinColumns =  {@JoinColumn(name = "user_to", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_from", referencedColumnName = "id")})
+    private Set<User> friendInvitations;
+
     public Timestamp getLastVisit() {
         return lastVisit;
     }
@@ -73,6 +81,9 @@ public class User implements Serializable{
     }
 
     public boolean isOnline() {
+        if(lastVisit == null){
+            lastVisit = new Timestamp(0);
+        }
         online = (System.currentTimeMillis() - lastVisit.getTime()) < 60000;
         return online;
     }
@@ -146,6 +157,18 @@ public class User implements Serializable{
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setLastVisit(Timestamp lastVisit) {
+        this.lastVisit = lastVisit;
+    }
+
+    public Set<User> getFriendInvitations() {
+        return friendInvitations;
+    }
+
+    public void setFriendInvitations(Set<User> friendInvitations) {
+        this.friendInvitations = friendInvitations;
     }
 
     @Override

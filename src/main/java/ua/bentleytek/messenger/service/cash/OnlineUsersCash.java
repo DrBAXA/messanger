@@ -5,18 +5,21 @@ import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class OnlineUsersCash extends Cleanable {
-    @Autowired
-    UsersDAO usersDAO;
+
+    private UsersDAO usersDAO;
 
     private Map<Integer, User> onLineById = new ConcurrentHashMap<>();
     private Map<String, Integer> onLineByName = new ConcurrentHashMap<>();
+
+    @Autowired
+    public OnlineUsersCash(UsersDAO usersDAO) {
+        this.usersDAO = usersDAO;
+    }
 
     public void add(User user){
         onLineById.put(user.getId(), user);
@@ -38,20 +41,6 @@ public class OnlineUsersCash extends Cleanable {
 
     public boolean contains(int id){
         return onLineById.containsKey(id);
-    }
-
-    public boolean contains(String name){
-        return onLineByName.containsKey(name);
-    }
-
-    public Set<Integer> getOnline(){
-        Set<Integer> result = new HashSet<>();
-        for(User user : onLineById.values()){
-            if(user.isOnline()){
-                result.add(user.getId());
-            }
-        }
-        return result;
     }
 
     public void clean(){
