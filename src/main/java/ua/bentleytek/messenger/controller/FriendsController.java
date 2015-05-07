@@ -60,7 +60,7 @@ public class FriendsController {
             return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         }
     }
-    @RequestMapping("/invitation")
+    @RequestMapping("/invitations")
     public ResponseEntity<Set<User>> getInvitations(Principal principal){
         if(principal != null){
             Set<User> invitations = userService.getUser(principal.getName()).getFriendInvitations();

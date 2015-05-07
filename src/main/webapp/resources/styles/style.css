@@ -107,3 +107,7 @@
     resize: none;
     background-color: inherit;
 }
+
+.invitations:hover{
+    cursor: pointer;
+}

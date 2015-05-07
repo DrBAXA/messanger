@@ -22,7 +22,12 @@
     <body>
         <div class="container col-lg-6 col-lg-offset-3 col-md-6 col-md-offset-3 col-sm-12 ">
             <nav class="navbar navbar-default">
-                <p class="navbar-right navbar-text">Signed in as <a href="/logout" class="navbar-link">${user}</a></p>
+                <div class="navbar-right">
+                    <c:if test="${not empty(invitations)}">
+                        <a class="navbar-link navbar-text invitations"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>(${invitations})</a>
+                    </c:if>
+                    <p class="navbar-text">Ви увійшли як ${user} (<a href="/logout" class="navbar-link">вийти</a>)</p>
+                </div>
             </nav>
             <div class="col-lg-4 col-md-4 column friends-column">
                 <ul class="media-list" id="friends">
