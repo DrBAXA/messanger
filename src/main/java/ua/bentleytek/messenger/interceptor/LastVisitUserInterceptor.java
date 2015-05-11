@@ -11,7 +11,7 @@ import ua.bentleytek.messenger.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class UserInterceptor extends HandlerInterceptorAdapter {
+public class LastVisitUserInterceptor extends HandlerInterceptorAdapter {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 

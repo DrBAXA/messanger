@@ -58,12 +58,15 @@ public class FriendsController {
     @RequestMapping(value = "/invitations/{id}", method = RequestMethod.POST)
     public ResponseEntity<Void> addInvitation(Principal principal,
                                               @PathVariable("id") int userId) {
-        if (userService.addInvitation(principal.getName(), userId)) {
-            System.out.println("invitation!!!!!!!!!!!!!!");
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        if(principal != null) {
+            if (userService.addInvitation(principal.getName(), userId)) {
+                System.out.println("invitation!!!!!!!!!!!!!!");
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+            }
         }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @RequestMapping("/invitations")

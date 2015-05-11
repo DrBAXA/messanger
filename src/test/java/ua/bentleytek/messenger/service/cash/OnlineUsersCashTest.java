@@ -32,11 +32,9 @@ public class OnlineUsersCashTest {
 
         when(user1.getId()).thenReturn(1);
         when(user1.getName()).thenReturn("user1");
-        when(user1.isOnline()).thenReturn(true);
 
         when(user2.getId()).thenReturn(2);
         when(user2.getName()).thenReturn("user2");
-        when(user2.isOnline()).thenReturn(false);
     }
 
 

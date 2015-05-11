@@ -21,6 +21,7 @@ import java.util.Properties;
 @PropertySources({
         @PropertySource("classpath:properties/hibernate.properties"),
         @PropertySource("classpath:properties/jdbc.properties"),
+        @PropertySource("classpath:properties/serverapp.properties"),
 })
 @Import({SecurityConfiguration.class, MvcConfiguration.class})
 public class AppContext {

@@ -78,14 +78,6 @@ public class UserService {
         }
     }
 
-    /**
-     * @param id
-     * @return status of given user
-     * don't ask a DB
-     */
-    public boolean isOnLine(int id){
-        return onlineUsersCash.contains(id);
-    }
 
     /**
      * Load users friends and invitations from DB before adding to cash to prevent LazyInitializationException

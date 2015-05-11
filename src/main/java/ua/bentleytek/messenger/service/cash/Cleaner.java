@@ -1,20 +1,22 @@
 package ua.bentleytek.messenger.service.cash;
 
-import ua.bentleytek.messenger.service.cash.Cleanable;
-
 public class Cleaner extends Thread{
 
-    public Cleaner(Cleanable object) {
+    private Cleanable object;
+
+    private long timeout;
+
+    public Cleaner(Cleanable object, long timeout) {
         this.object = object;
+        this.timeout = timeout;
     }
 
-    private Cleanable object;
     @Override
     public void run(){
         while (! isInterrupted()){
             object.clean();
             try {
-                sleep(60000);
+                sleep(timeout);
             } catch (InterruptedException ie) {
                 //do nothing
             }

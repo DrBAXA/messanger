@@ -55,9 +55,6 @@ public class User implements Serializable{
     @Column(name = "last_visit")
     private Timestamp lastVisit;
 
-    @Transient
-    private boolean online;
-
     @JsonIgnore
     @ManyToMany
     @JoinTable( name = "friends",
@@ -80,13 +77,6 @@ public class User implements Serializable{
         this.lastVisit = new Timestamp(System.currentTimeMillis());
     }
 
-    public boolean isOnline() {
-        if(lastVisit == null){
-            lastVisit = new Timestamp(0);
-        }
-        online = (System.currentTimeMillis() - lastVisit.getTime()) < 60000;
-        return online;
-    }
 
     public String getPhoto() {
         return photo;
@@ -94,10 +84,6 @@ public class User implements Serializable{
 
     public void setPhoto(String photo) {
         this.photo = photo;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
     }
 
     public User() {

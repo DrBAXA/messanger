@@ -2,6 +2,7 @@ package ua.bentleytek.messenger.controller;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,9 @@ public class MessageController {
 
     private final Logger logger = Logger.getLogger(this.getClass());
 
-    public static final int LONG_QUERY_TIMEOUT = 1000000;
+    @Autowired
+    Environment env;
+
     @Autowired
     private MessageService messageService;
 
@@ -76,7 +79,7 @@ public class MessageController {
                 synchronized (event){
                     eventHandler.subscribe(user.getId(), event);
                     try {
-                        event.wait(LONG_QUERY_TIMEOUT);
+                        event.wait(env.getProperty("timeout.long.query", Integer.class));
                         messageService.resetNew(user.getId());
                         return new ResponseEntity<>(messageService.getUnreadCountBySender(user), HttpStatus.OK);
                     } catch (InterruptedException ie) {

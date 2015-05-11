@@ -1,6 +1,7 @@
 package ua.bentleytek.messenger.service.cash;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import ua.bentleytek.messenger.dao.UsersDAO;
 import ua.bentleytek.messenger.entity.User;
@@ -11,11 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class OnlineUsersCash extends Cleanable {
 
-    private UsersDAO usersDAO;
+    @Autowired
+    Environment env;
 
     private Map<Integer, User> onLineById = new ConcurrentHashMap<>();
     private Map<String, Integer> onLineByName = new ConcurrentHashMap<>();
 
+    private UsersDAO usersDAO;
     @Autowired
     public OnlineUsersCash(UsersDAO usersDAO) {
         this.usersDAO = usersDAO;
@@ -46,7 +49,7 @@ public class OnlineUsersCash extends Cleanable {
     public void clean(){
         for(Integer id : onLineById.keySet()){
             User user = onLineById.get(id);
-            if(! user.isOnline()){
+            if(System.currentTimeMillis() - user.getLastVisit().getTime() > env.getProperty("timeout.online", Integer.class)){
                 onLineByName.remove(user.getName());
                 onLineById.remove(id);
                 usersDAO.save(user);
