@@ -14,6 +14,9 @@
             function getHomeUrl(){
                 return '<c:url value="/"/>';
             }
+            function getTimeout(){
+                return ${timeout}
+            }
         </script>
         <title>
             BentleyTecMessenger
