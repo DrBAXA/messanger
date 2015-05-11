@@ -10,7 +10,7 @@
     max-height: 600px;
 }
 
-.friend-element{
+.friend-element, .invitor-element{
     margin-top: 0;
     padding: 5px;
     height: 80px;

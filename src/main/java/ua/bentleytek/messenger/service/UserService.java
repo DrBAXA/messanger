@@ -116,4 +116,31 @@ public class UserService {
         usersDAO.save(user);
         return result;
     }
+
+    /**
+     * Move invitor from invitors to friends if it was in invitors
+     * @param userName
+     * @param invitorId
+     * @return true if success or false if invitor wasn't found in invitors of this user
+     */
+    public boolean acceptInvitation(String userName, int invitorId){
+        User user = getUser(userName);
+        User invitor = getUser(invitorId);
+        if(user.getFriendInvitations().contains(invitor)){
+            user.getFriends().add(invitor);
+            user.getFriendInvitations().remove(invitor);
+            usersDAO.save(user);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean rejectInvitation(String name, int invitorId) {
+        User user = getUser(name);
+        User invitor = getUser(invitorId);
+        boolean result = user.getFriendInvitations().remove(invitor);
+        usersDAO.save(user);
+        return result;
+    }
 }

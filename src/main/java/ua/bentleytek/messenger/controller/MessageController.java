@@ -1,5 +1,6 @@
 package ua.bentleytek.messenger.controller;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ import static ua.bentleytek.messenger.service.EventType.NEW_MESSAGE;
 @Controller
 @RequestMapping("/messages")
 public class MessageController {
+
+    private final Logger logger = Logger.getLogger(this.getClass());
 
     public static final int LONG_QUERY_TIMEOUT = 1000000;
     @Autowired

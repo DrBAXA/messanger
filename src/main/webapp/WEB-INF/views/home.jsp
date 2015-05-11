@@ -24,7 +24,7 @@
             <nav class="navbar navbar-default">
                 <div class="navbar-right">
                     <c:if test="${not empty(invitations)}">
-                        <a class="navbar-link navbar-text invitations"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>(${invitations})</a>
+                        <p onclick="getInvitations()" class="navbar-link navbar-text invitations"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>(${invitations})</p>
                     </c:if>
                     <p class="navbar-text">Ви увійшли як ${user} (<a href="/logout" class="navbar-link">вийти</a>)</p>
                 </div>
@@ -48,7 +48,7 @@
                     <input class="message-text" id="message" placeholder="напишіть повідомлення ..." onkeyup="sendMessage(event)">
             </div>
         </div>
-        <!-- Modal -->
+        <!-- Modal find friends-->
         <div class="modal fade" id="find-friend-modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -57,7 +57,17 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Відмінити</button>
-                        <button type="button" id="invitation" class="btn btn-primary">Надіслати запрошення</button>
+                        <button type="button" id="invite" class="btn btn-primary">Надіслати запрошення</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%--Modal invitations--%>
+        <div class="modal fade" id="invitations" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body" id="invitations-container">
+
                     </div>
                 </div>
             </div>

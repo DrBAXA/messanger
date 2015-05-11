@@ -1,5 +1,6 @@
 package ua.bentleytek.messenger.controller;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,8 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/signup")
 public class SignUpController {
+
+    private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     UserService userService;

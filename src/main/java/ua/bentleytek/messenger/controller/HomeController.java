@@ -1,5 +1,6 @@
 package ua.bentleytek.messenger.controller;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,6 +13,8 @@ import java.security.Principal;
 
 @Controller
 public class HomeController {
+
+    private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     UserService userService;

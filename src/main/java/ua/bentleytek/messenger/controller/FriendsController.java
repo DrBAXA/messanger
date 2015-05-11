@@ -1,5 +1,6 @@
 package ua.bentleytek.messenger.controller;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,10 @@ import java.util.Set;
 @RequestMapping("/friends")
 public class FriendsController {
 
+    public static final String LOG_REQUEST = "Request received";
+
+    private final Logger logger = Logger.getLogger(this.getClass());
+
     @Autowired
     UserService userService;
 
@@ -30,7 +35,7 @@ public class FriendsController {
         }
     }
 
-    @RequestMapping("/online")
+    @RequestMapping(value = "/online", method = RequestMethod.GET)
     public ResponseEntity<Set<Integer>> checkOnline(Principal principal) {
         if (principal != null) {
             return new ResponseEntity<>(userService.getOnlineFriends(principal.getName()), HttpStatus.OK);
@@ -40,26 +45,27 @@ public class FriendsController {
 
     }
 
-    @RequestMapping("/find")
-    public ResponseEntity<User> find(@RequestParam String nameOrEmail){
+    @RequestMapping(value = "/find", method = RequestMethod.GET)
+    public ResponseEntity<User> find(@RequestParam String nameOrEmail) {
         User user = userService.find(nameOrEmail);
-        if(user != null){
+        if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
-        }else {
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @RequestMapping(value = "/invitation/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/invitations/{id}", method = RequestMethod.POST)
     public ResponseEntity<Void> addInvitation(Principal principal,
-                                           @PathVariable("id") int userId)
-    {
-        if(userService.addInvitation(principal.getName(), userId)){
+                                              @PathVariable("id") int userId) {
+        if (userService.addInvitation(principal.getName(), userId)) {
+            System.out.println("invitation!!!!!!!!!!!!!!");
             return new ResponseEntity<>(HttpStatus.OK);
-        }else {
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         }
     }
+
     @RequestMapping("/invitations")
     public ResponseEntity<Set<User>> getInvitations(Principal principal){
         if(principal != null){
@@ -68,4 +74,34 @@ public class FriendsController {
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
+
+    @RequestMapping(value = "/invitations/{id}/accept", method = RequestMethod.POST)
+    public ResponseEntity<Void> acceptInvitation(Principal principal,
+                                                 @PathVariable("id") int invitorId)
+    {
+        if(principal != null){
+            boolean result = userService.acceptInvitation(principal.getName(), invitorId);
+            if(result){
+                System.out.println("invitation accepted!!!!!!!!!!!!!!");
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(value = "/invitations/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> rejectInvitation(Principal principal,
+                                                 @PathVariable("id") int invitorId)
+    {
+        if(principal != null){
+            boolean result = userService.rejectInvitation(principal.getName(), invitorId);
+            if(result){
+                System.out.println("invitation rejected!!!!!!!!!!!!!!");
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
 }
