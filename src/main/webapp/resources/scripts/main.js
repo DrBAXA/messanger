@@ -268,10 +268,12 @@ function rejectInvitation(id){
 }
 
 function updateInvStatus(){
-    var invCount = $("#inv-count").text()-1;
-    $("#inv-count").text(invCount);
-    if(invCount = 0){
-        $("#inv-count-container").visible(false);
+    var invCountElement = $("#inv-count");
+    var regexp = /[\(\)]/g;
+    var invCount = invCountElement.text().replace(regexp, '')*1 - 1;
+    invCountElement.text('(' + invCount + ')');
+    if(invCount == 0){
+        $("#inv-count-container").hide();
     }
 }
 

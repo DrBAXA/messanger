@@ -116,6 +116,8 @@ public class UserService {
         if(user.getFriendInvitations().contains(invitor)){
             user.getFriends().add(invitor);
             user.getFriendInvitations().remove(invitor);
+            invitor.getFriends().add(user);
+            usersDAO.save(invitor);
             usersDAO.save(user);
             return true;
         }
