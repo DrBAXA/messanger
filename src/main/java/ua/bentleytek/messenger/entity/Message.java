@@ -34,10 +34,6 @@ public class Message {
         return id;
     }
 
-    /*public void setId(int id) {
-        this.id = id;
-    }*/
-
     public String getText() {
         return text;
     }
@@ -85,10 +81,8 @@ public class Message {
 
         Message message = (Message) o;
 
-        if (!date.equals(message.date)) return false;
-        if (!text.equals(message.text)) return false;
+        return date.equals(message.date) && text.equals(message.text);
 
-        return true;
     }
 
     @Override

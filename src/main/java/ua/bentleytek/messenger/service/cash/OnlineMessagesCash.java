@@ -27,7 +27,6 @@ public class OnlineMessagesCash extends Cleanable {
 
     /**
      * Add user in cash
-     * @param id
      */
     public void register(int id){
         if(! newMessages.containsKey(id)){
@@ -38,8 +37,6 @@ public class OnlineMessagesCash extends Cleanable {
 
     /**
      * Check if user is registered in cash
-     * @param id
-     * @return
      */
     public boolean registered(int id){
         return newMessages.containsKey(id);
@@ -47,7 +44,6 @@ public class OnlineMessagesCash extends Cleanable {
     /**
      * Add message to cash if user is registered in this cash
      * @see #register(int)
-     * @param message
      * @return true if message was added
      */
     public boolean put(Message message){
@@ -93,8 +89,6 @@ public class OnlineMessagesCash extends Cleanable {
 
     /**
      * Returns all messages that was sent to this user
-     * @param userId
-     * @return
      */
     public Set<Message> get(int userId){
         if(newMessages.containsKey(userId)){
@@ -104,11 +98,10 @@ public class OnlineMessagesCash extends Cleanable {
     }
 
     /**
-     * @param userId
      * @return true if since last check new messages received and false otherwise.
      */
     public boolean hasNew(int userId){
-        return changes.containsKey(userId) ?  changes.get(userId).getAndSet(false) : false;
+        return changes.containsKey(userId) && changes.get(userId).getAndSet(false);
     }
 
     public void resetNew(int userId){

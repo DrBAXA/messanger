@@ -80,11 +80,10 @@ public class UserService {
 
 
     /**
-     * Load users friends and invitations from DB before adding to cash to prevent LazyInitializationException
-     * instead of use FetchType.EAGER
+     * Load users friends and invitations from DB before adding to cash to prevent LazyInitializationException.
+     * Used instead of use FetchType.EAGER
      * because FetchType.EAGER loads friends recursively
      * i.e. loads friends of friends.
-     * @param user
      */
     private void initFriends(User user){
         System.out.println(user.getFriends().size());
@@ -97,8 +96,6 @@ public class UserService {
 
     /**
      * Add user given by invitorName to invitationSet of user given by userId
-     * @param invitorName
-     * @param userId
      * @return true if adde or false if already presented in this set
      */
     public boolean addInvitation(String invitorName, int userId) {
@@ -111,8 +108,6 @@ public class UserService {
 
     /**
      * Move invitor from invitors to friends if it was in invitors
-     * @param userName
-     * @param invitorId
      * @return true if success or false if invitor wasn't found in invitors of this user
      */
     public boolean acceptInvitation(String userName, int invitorId){

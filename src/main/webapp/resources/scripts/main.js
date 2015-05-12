@@ -64,6 +64,7 @@ function registerEvents() {
 
     checkChangesCycle();
 }
+
 /*
  Init updating data each 10 seconds;
  */
@@ -71,116 +72,8 @@ function checkChangesCycle() {
     setInterval(checkFriendsStatus, getTimeout());
 }
 
-function findFriend(){
-    var nameOrEmail = $('#find');
-    $.ajax({
-        url: getHomeUrl() + 'friends/find?nameOrEmail=' +nameOrEmail.val(),
-        type: 'GET',
-        contentType: 'application/json; charset=utf-8',
-        statusCode: {
-            200: function(data){
-                nameOrEmail.val('');
-                showFound(data);
-            }
-        }
-    });
-    return false
-}
+//-----------FRIENDS-------------------------------------
 
-function showFound(user){
-    var userElement = createFriendElement(user);
-    var modalContainer = $('#found');
-    modalContainer.empty();
-    modalContainer.append(userElement);
-    if(user.id in friends){
-        $('#invite').attr('disabled', true);
-    }else{
-        $('#invite').attr('onclick', 'sandInvitation(' + user.id + ')');
-    }
-    $('#find-friend-modal').modal('toggle');
-}
-
-function sandInvitation(userId){
-    $.ajax({
-        url: getHomeUrl() + 'friends/invitations/' +userId,
-        type: 'POST',
-        contentType: 'application/json; charset=utf-8',
-        statusCode: {
-            200: function(){
-                $('#find-friend-modal').modal('toggle');
-            }
-        }
-    });
-}
-
-
-function getInvitations(){
-    $.ajax({
-        url: getHomeUrl() + 'friends/invitations',
-        type: 'GET',
-        contentType: 'application/json; charset=utf-8',
-        statusCode: {
-            200: showInvitations
-        }
-    })
-}
-
-function showInvitations(invitations){
-    var invitationContainer = $('#invitations-container');
-    invitationContainer.empty();
-    invitations.forEach(function(invitation){
-        var element = createInvElement(invitation);
-        invitationContainer.append(element);
-    });
-    $('#invitations').modal('toggle');
-}
-
-/*
- */
-function createInvElement(invitor) {
-    var online = invitor.online ? 'online' : '';
-    var friendElementHtml = '<li class="invitor-element media" id="' + invitor.id + '">' +
-                                '<div class="media-left">' +
-                                    '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources/img/' + invitor.photo + '">' +
-                                '</div>' +
-                                '<div class="media-body">' +
-                                    '<h4 class="media-heading">' + invitor.name + '</h4>' +
-                                    '<span>' + online + '</span>' +
-                                '</div>' +
-                                '<div class="media-right">' +
-                                    '<button class="btn btn-danger" onclick="rejectInvitation(' + invitor.id + ')"><span class="glyphicon glyphicon-remove-sign"></span></button>' +
-                                    '<button class="btn btn-success" onclick="acceptInvitation(' + invitor.id + ')"><span class="glyphicon glyphicon-ok-sign"></span></button>' +
-                                '</div>' +
-                            '</li>';
-    return $.parseHTML(friendElementHtml);
-}
-
-
-
-function acceptInvitation(id){
-    $.ajax({
-        url: getHomeUrl() + 'friends/invitations/' + id + '/accept',
-        type: 'POST',
-        contentType: 'application/json; charset=utf-8',
-        statusCode: {
-            200: function(){
-                $('#invitations').modal('toggle');
-                loadFriends();
-            }
-        }
-    })
-}
-
-function rejectInvitation(id){
-    $.ajax({
-        url: getHomeUrl() + 'friends/invitations/' + id,
-        type: 'DELETE',
-        contentType: 'application/json; charset=utf-8',
-        statusCode: {
-            200: window.alert('accept')
-        }
-    })
-}
 /*
  Request to get list of friends
  */
@@ -203,6 +96,7 @@ function showFriends(friends) {
     friends.forEach(addFriendElement);
     selectFriend(friends[0].id);
 }
+
 /*
  Add each friend to document
  */
@@ -211,20 +105,21 @@ function addFriendElement(friend) {
     $('#friends').append(friendElement);
     friends[friend.id] = 0;
 }
+
 /*
  Create friends element from html
  */
 function createFriendElement(friend) {
     var online = friend.online ? 'online' : '';
     var friendElementHtml = '<li class="friend-element" id="' + friend.id + '">' +
-                                '<div class="media-left">' +
-                                    '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources/img/' + friend.photo + '">' +
-                                '</div>' +
-                                '<div class="media-body">' +
-                                    '<h4 class="media-heading">' + friend.name + '</h4>' +
-                                    '<span>' + online + '</span>' +
-                                '</div>' +
-                            '</li>';
+        '<div class="media-left">' +
+        '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources/img/' + friend.photo + '">' +
+        '</div>' +
+        '<div class="media-body">' +
+        '<h4 class="media-heading">' + friend.name + '</h4>' +
+        '<span>' + online + '</span>' +
+        '</div>' +
+        '</li>';
     return $.parseHTML(friendElementHtml);
 }
 
@@ -263,6 +158,124 @@ function clearFriendsStatus() {
     }
 }
 
+function findFriend(){
+    var nameOrEmail = $('#find');
+    $.ajax({
+        url: getHomeUrl() + 'friends/find?nameOrEmail=' +nameOrEmail.val(),
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: function(data){
+                nameOrEmail.val('');
+                showFoundFriends(data);
+            }
+        }
+    });
+    return false
+}
+
+function showFoundFriends(user){
+    var userElement = createFriendElement(user);
+    var modalContainer = $('#found');
+    modalContainer.empty();
+    modalContainer.append(userElement);
+    if(user.id in friends){
+        $('#invite').attr('disabled', true);
+    }else{
+        $('#invite').attr('onclick', 'sandInvitation(' + user.id + ')');
+    }
+    $('#find-friend-modal').modal('toggle');
+}
+
+//--------------FRIEND_INVITATIONS-------------------------
+
+function sandInvitation(userId){
+    $.ajax({
+        url: getHomeUrl() + 'friends/invitations/' +userId,
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: function(){
+                $('#find-friend-modal').modal('toggle');
+            }
+        }
+    });
+}
+
+function getInvitations(){
+    $.ajax({
+        url: getHomeUrl() + 'friends/invitations',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: showInvitations
+        }
+    })
+}
+
+function showInvitations(invitations){
+    var invitationContainer = $('#invitations-container');
+    invitationContainer.empty();
+    invitations.forEach(function(invitation){
+        var element = createInvElement(invitation);
+        invitationContainer.append(element);
+    });
+    $('#invitations').modal('toggle');
+}
+
+function createInvElement(invitor) {
+    var online = invitor.online ? 'online' : '';
+    var friendElementHtml = '<li class="invitor-element media" id="' + invitor.id + '">' +
+                                '<div class="media-left">' +
+                                    '<img class="friend-photo media-object" src="' + getHomeUrl() + 'resources/img/' + invitor.photo + '">' +
+                                '</div>' +
+                                '<div class="media-body">' +
+                                    '<h4 class="media-heading">' + invitor.name + '</h4>' +
+                                    '<span>' + online + '</span>' +
+                                '</div>' +
+                                '<div class="media-right">' +
+                                    '<button class="btn btn-danger" onclick="rejectInvitation(' + invitor.id + ')"><span class="glyphicon glyphicon-remove-sign"></span></button>' +
+                                    '<button class="btn btn-success" onclick="acceptInvitation(' + invitor.id + ')"><span class="glyphicon glyphicon-ok-sign"></span></button>' +
+                                '</div>' +
+                            '</li>';
+    return $.parseHTML(friendElementHtml);
+}
+
+function acceptInvitation(id){
+    $.ajax({
+        url: getHomeUrl() + 'friends/invitations/' + id + '/accept',
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: function(){
+                $('#invitations').modal('toggle');
+                loadFriends();
+                updateInvStatus();
+            }
+        }
+    })
+}
+
+function rejectInvitation(id){
+    $.ajax({
+        url: getHomeUrl() + 'friends/invitations/' + id,
+        type: 'DELETE',
+        contentType: 'application/json; charset=utf-8',
+        statusCode: {
+            200: updateInvStatus()
+        }
+    })
+}
+
+function updateInvStatus(){
+    var invCount = $("#inv-count").text()-1;
+    $("#inv-count").text(invCount);
+    if(invCount = 0){
+        $("#inv-count-container").visible(false);
+    }
+}
+
+//-----------------------MESSAGES----------------------------------------------------
 /*
  Request to get unread messages count by friends
  */
@@ -299,7 +312,6 @@ function processNewMessages(unreadMap) {
         }
     }
 }
-
 
 /*
  Clear count of unread messages for each friend
@@ -348,7 +360,7 @@ function addUnreadMessages(friendId, count) {
 }
 
 /*
-
+Update count of loaded messages and summary height if messages stack
  */
 function increaseValues(elementHeight) {
     messagesCount++;

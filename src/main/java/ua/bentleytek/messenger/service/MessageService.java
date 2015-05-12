@@ -26,7 +26,6 @@ public class MessageService {
 
     /**
      *
-     * @param user
      * @return count unread messages for each user that sent still unread message
      */
     public Map<Integer, Integer> getUnreadCountBySender(User user){
@@ -58,21 +57,16 @@ public class MessageService {
      * Get messages that is sent to given user from given friend
      * Get its both from cash and DB
      * if first is more than 0(e.i. loads old messages) cash will not be used
-     * @param user
-     * @param friend
-     * @param first
-     * @param count
-     * @return
      */
     public Iterable<Message> getMessages(User user, User friend, int first, int count){
         ArrayList<Message> result = new ArrayList<>();
-        //Load messages from cash add to result
+        //Load messages from cash and add to result
         if(messagesCash.registered(user.getId()) && first == 0) {
             for(Message message : messagesCash.get(user.getId(), friend.getId(), count)){
                 result.add(message);
             }
         }
-        //Load messages from add to result and ser as read if required
+        //Load messages from DB, add to result and set as read if required
         int remains = count - result.size();
         if(remains > 0){
             for(Message message : messageDAO.getByUser(user, friend, first+result.size(), remains)){
@@ -87,7 +81,6 @@ public class MessageService {
     /**
      * If receiver is registered in cash(e.i. online) message will be added to cash
      * otherwise to DB
-     * @param message
      */
     public void addMessage(Message message){
         message.setDate(new Timestamp(System.currentTimeMillis()));
@@ -101,15 +94,12 @@ public class MessageService {
 
     /**
      * Set messages from friend to user as read
-     * @param userId
-     * @param friendId
      */
     public void read(int userId, int friendId){
         messagesCash.markRead(userId, friendId);
     }
     /**
      * Mark message as read
-     * @param message
      */
     private void read(Message message){
         message.setRead();
@@ -117,7 +107,6 @@ public class MessageService {
     }
 
     /**
-     * @param userId
      * @return true if since last check new messages received and false otherwise.
      */
     public boolean hasNew(int userId){

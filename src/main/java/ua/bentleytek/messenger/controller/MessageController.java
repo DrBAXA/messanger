@@ -69,7 +69,6 @@ public class MessageController {
     //Long query
     @RequestMapping("/unread")
     public ResponseEntity<Map<Integer, Integer>> checkNewMessages(Principal principal){
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!unread");
         if(principal != null) {
             User user = userService.getUser(principal.getName());
             if(messageService.hasNew(user.getId())) {

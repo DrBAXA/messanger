@@ -1,7 +1,9 @@
 package ua.bentleytek.messenger.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -16,6 +18,9 @@ import java.util.List;
 @EnableWebMvc
 public class MvcConfiguration extends WebMvcConfigurerAdapter{
 
+    @Autowired
+    Environment env;
+
 	@Bean
 	public ViewResolver getViewResolver(){
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
@@ -24,13 +29,11 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 		return resolver;
 	}
 
-	private static final int MAX_UPLOAD_SIZE = 3*1024*1024;//3 MB
-
 	@Bean
 	public CommonsMultipartResolver  multipartResolver(){
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
 		multipartResolver.setDefaultEncoding("utf-8");
-		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
+		multipartResolver.setMaxUploadSize(env.getProperty("max.photo.size", Integer.class));
 		return multipartResolver;
 	}
 	
@@ -50,6 +53,8 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 
     @Override
     public void addInterceptors(InterceptorRegistry interceptorRegistry){
-        interceptorRegistry.addInterceptor(new LastVisitUserInterceptor()).addPathPatterns("/**");
+        interceptorRegistry.addInterceptor(new LastVisitUserInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/resources/**");
     }
 }

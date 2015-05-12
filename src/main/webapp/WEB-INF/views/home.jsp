@@ -27,7 +27,10 @@
             <nav class="navbar navbar-default">
                 <div class="navbar-right">
                     <c:if test="${not empty(invitations)}">
-                        <p onclick="getInvitations()" class="navbar-link navbar-text invitations"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>(${invitations})</p>
+                        <p id="inv-count-container" onclick="getInvitations()" class="navbar-link navbar-text invitations" id="inv-count">
+                            <span id="inv-count" class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                            (${invitations})
+                        </p>
                     </c:if>
                     <p class="navbar-text">Ви увійшли як ${user} (<a href="/logout" class="navbar-link">вийти</a>)</p>
                 </div>

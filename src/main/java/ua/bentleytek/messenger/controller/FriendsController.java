@@ -1,6 +1,5 @@
 package ua.bentleytek.messenger.controller;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +17,6 @@ import java.util.Set;
 @Controller
 @RequestMapping("/friends")
 public class FriendsController {
-
-    public static final String LOG_REQUEST = "Request received";
-
-    private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
     UserService userService;
@@ -55,25 +50,24 @@ public class FriendsController {
         }
     }
 
-    @RequestMapping(value = "/invitations/{id}", method = RequestMethod.POST)
-    public ResponseEntity<Void> addInvitation(Principal principal,
-                                              @PathVariable("id") int userId) {
-        if(principal != null) {
-            if (userService.addInvitation(principal.getName(), userId)) {
-                System.out.println("invitation!!!!!!!!!!!!!!");
-                return new ResponseEntity<>(HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-            }
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
     @RequestMapping("/invitations")
     public ResponseEntity<Set<User>> getInvitations(Principal principal){
         if(principal != null){
             Set<User> invitations = userService.getUser(principal.getName()).getFriendInvitations();
             return new ResponseEntity<>(invitations, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @RequestMapping(value = "/invitations/{id}", method = RequestMethod.POST)
+    public ResponseEntity<Void> addInvitation(Principal principal,
+                                              @PathVariable("id") int userId) {
+        if(principal != null) {
+            if (userService.addInvitation(principal.getName(), userId)) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+            }
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
@@ -85,7 +79,6 @@ public class FriendsController {
         if(principal != null){
             boolean result = userService.acceptInvitation(principal.getName(), invitorId);
             if(result){
-                System.out.println("invitation accepted!!!!!!!!!!!!!!");
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }
@@ -99,7 +92,6 @@ public class FriendsController {
         if(principal != null){
             boolean result = userService.rejectInvitation(principal.getName(), invitorId);
             if(result){
-                System.out.println("invitation rejected!!!!!!!!!!!!!!");
                 return new ResponseEntity<>(HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);

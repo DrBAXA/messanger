@@ -54,6 +54,7 @@ public class SignUpController {
 
         userService.addUser(user);
 
+        //Login user automatically if sign up was success
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getName(), rawPassword);
         Authentication authenticatedUser = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
