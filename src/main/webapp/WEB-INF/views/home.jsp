@@ -15,7 +15,7 @@
                 return '<c:url value="/"/>';
             }
             function getTimeout(){
-                return ${timeout}
+                return ${timeout};
             }
         </script>
         <title>
